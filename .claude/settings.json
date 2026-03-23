@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(perl -ne 'printf \"\"%d: %s\"\", $., $_ if \\($. >= 348 && $. <= 355\\)' \"C:/Users/user/OneDrive/EDUARDO CASTAÑO/Codigos HTML/Claude/GMAO_Sistema \\(3\\).html\")",
+      "Bash(WORKDIR=\"/c/Users/user/OneDrive/EDUARDO CASTAÑO/Codigos HTML/Claude\")",
+      "Bash(perl \"$WORKDIR/build_suite.pl\")",
+      "Bash(wc -l \"c:\\\\Users\\\\user\\\\OneDrive\\\\EDUARDO CASTAÑO\\\\Codigos HTML\\\\Claude\\\\crm \\(7\\).html\")"
+    ]
+  }
+}

@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovaCRM</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --accent:#1d9e75;--accent-light:#e1f5ee;--accent-dark:#085041;
+  --bg:#f4f3f0;--surface:#fff;--surface2:#f1efe8;
+  --border:rgba(0,0,0,0.09);--border2:rgba(0,0,0,0.16);
+  --text:#1a1a18;--text2:#5f5e5a;--text3:#888780;
+  --rad:8px;--rad-lg:12px;--nav-w:220px;
+  --shadow:0 1px 3px rgba(0,0,0,0.06);
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+.app{display:flex;min-height:100vh}
+.nav{width:var(--nav-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:10;overflow-y:auto}
+.nav-brand{padding:18px 16px 14px;font-size:15px;font-weight:700;letter-spacing:-.5px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--border)}
+.brand-dot{width:28px;height:28px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:700}
+.nav-section{padding:14px 14px 4px;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;font-size:13px;cursor:pointer;color:var(--text2);border-radius:var(--rad);margin:1px 6px;transition:all .13s}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{color:var(--accent-dark);background:var(--accent-light);font-weight:500}
+.nav-spacer{flex:1}
+.nav-footer{padding:10px;border-top:1px solid var(--border)}
+.nav-user{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:var(--rad);background:var(--surface2)}
+.nav-av{width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white}
+.main{margin-left:var(--nav-w);flex:1;padding:26px 28px;min-height:100vh}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;gap:12px}
+.page-title{font-size:20px;font-weight:700;letter-spacing:-.4px}
+.page-subtitle{font-size:12px;color:var(--text3);margin-top:3px}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:var(--rad-lg);padding:14px 16px;box-shadow:var(--shadow)}
+.metric-label{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.metric-value{font-size:24px;font-weight:700;letter-spacing:-.5px;line-height:1}
+.metric-sub{font-size:11px;color:var(--text3);margin-top:5px}
+.metric.accent{background:var(--accent-light);border-color:#9fe1cb}
+.metric.accent .metric-value{color:var(--accent-dark)}
+.forecast-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--rad-lg);padding:16px 20px;margin-bottom:20px;box-shadow:var(--shadow)}
+.forecast-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
+.forecast-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.forecast-label{font-size:12px;color:var(--text2);width:140px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.forecast-bar-wrap{flex:1;background:var(--surface2);border-radius:4px;height:7px;overflow:hidden}
+.forecast-bar-fill{height:100%;border-radius:4px;background:var(--accent)}
+.forecast-val{font-size:12px;font-weight:600;color:var(--accent-dark);min-width:80px;text-align:right}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rad-lg);box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden}
+.card-pad{padding:16px 18px}
+.card-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:9px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;background:var(--surface2);border-bottom:1px solid var(--border)}
+td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--surface2)}
+.av{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.av-row{display:flex;align-items:center;gap:8px}
+.av-0{background:#e1f5ee;color:#085041}.av-1{background:#e6f1fb;color:#0c447c}
+.av-2{background:#faeeda;color:#633806}.av-3{background:#faece7;color:#712b13}
+.av-4{background:#eeedfe;color:#3c3489}.av-5{background:#eaf3de;color:#27500a}
+.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:500}
+.bg-green{background:#eaf3de;color:#27500a}.bg-amber{background:#faeeda;color:#633806}
+.bg-blue{background:#e6f1fb;color:#0c447c}.bg-gray{background:#f1efe8;color:#5f5e5a}
+.bg-teal{background:#e1f5ee;color:#085041}.bg-purple{background:#eeedfe;color:#3c3489}
+.btn{padding:7px 14px;font-size:13px;border-radius:var(--rad);border:1px solid var(--border2);background:var(--surface);cursor:pointer;color:var(--text);font-weight:500;transition:all .13s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.btn:hover{background:var(--surface2)}.btn:active{transform:scale(.98)}
+.btn-accent{background:var(--accent);color:white;border-color:var(--accent)}
+.btn-accent:hover{background:var(--accent-dark)}
+.btn-danger{background:#fcebeb;color:#791f1f;border-color:#f7c1c1}
+.btn-danger:hover{background:#f7c1c1}
+.btn-sm{padding:4px 9px;font-size:12px}
+.toolbar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.search-wrap{position:relative;flex:1;min-width:180px}
+.search-wrap input{width:100%;padding:7px 11px 7px 32px;font-size:13px;border:1px solid var(--border);border-radius:var(--rad);background:var(--surface);color:var(--text);outline:none}
+.search-wrap input:focus{border-color:var(--accent)}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px;pointer-events:none}
+select.filter{padding:7px 11px;font-size:13px;border:1px solid var(--border);border-radius:var(--rad);background:var(--surface);color:var(--text);cursor:pointer;outline:none}
+.pipeline-wrap{overflow-x:auto;padding-bottom:8px}
+.pipeline{display:grid;gap:10px;min-width:600px}
+.stage{background:var(--surface2);border-radius:var(--rad-lg);padding:11px;min-height:200px}
+.stage-head{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.stage:hover .stage-del-btn{opacity:1!important}
+.stage-forecast{font-size:11px;color:var(--text3);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.deal-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rad);padding:10px 11px;margin-bottom:7px;transition:border-color .13s}
+.deal-card:hover{border-color:var(--accent)}
+.deal-card.won{border-left:3px solid #1d9e75;background:#fcfffc}
+.deal-card.lost{border-left:3px solid #888780;opacity:.65}
+.deal-card.overdue{border-color:#f09595;background:#fff8f8}
+.deal-card.due-today{border-color:#fac775;background:#fffbf3}
+.deal-name{font-size:13px;font-weight:600;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.deal-co{font-size:11px;color:var(--text3);margin-bottom:5px}
+.deal-val{font-size:13px;color:var(--accent-dark);font-weight:700}
+.prob-bar{height:3px;background:var(--border);border-radius:2px;margin-top:6px;overflow:hidden}
+.prob-fill{height:100%;border-radius:2px;background:var(--accent)}
+.followup{display:flex;align-items:center;gap:4px;margin-top:6px;padding:4px 7px;border-radius:5px;font-size:11px;font-weight:500}
+.followup.overdue{background:#fcebeb;color:#a32d2d}
+.followup.today{background:#faeeda;color:#854f0b}
+.followup.upcoming{background:#e6f1fb;color:#185fa5}
+.followup.none{background:var(--surface2);color:var(--text3);cursor:pointer}
+.act-item{display:flex;gap:11px;padding:11px 0;border-bottom:1px solid var(--border)}
+.act-item:last-child{border-bottom:none}
+.act-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.act-icon.call{background:#e6f1fb}.act-icon.email{background:#eaf3de}
+.act-icon.meet{background:#faeeda}.act-icon.note{background:#eeedfe}
+.vendor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px;margin-bottom:20px}
+.vendor-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rad-lg);padding:16px 18px;box-shadow:var(--shadow)}
+.vendor-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.vendor-stat{background:var(--surface2);border-radius:var(--rad);padding:10px 12px}
+.vendor-stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.vendor-stat-val{font-size:17px;font-weight:700}
+.vendor-stat.accent{background:var(--accent-light)}
+.vendor-stat.accent .vendor-stat-val{color:var(--accent-dark)}
+.vendor-stat.accent .vendor-stat-label{color:var(--accent)}
+.tab-bar{display:flex;gap:2px;background:var(--surface2);border-radius:var(--rad);padding:3px;margin-bottom:18px;width:fit-content}
+.tab{padding:6px 14px;border-radius:6px;font-size:13px;cursor:pointer;color:var(--text2);transition:all .13s;font-weight:500}
+.tab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.config-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--rad-lg);padding:18px 20px}
+.config-item{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--border)}
+.config-item:last-child{border-bottom:none}
+.config-add{display:flex;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.config-add input,.config-add select{flex:1;padding:7px 10px;font-size:13px;border:1px solid var(--border);border-radius:var(--rad);background:var(--bg);color:var(--text);outline:none}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:100;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--rad-lg);border:1px solid var(--border);padding:22px;width:440px;max-width:95vw;box-shadow:0 8px 30px rgba(0,0,0,.13);animation:fadeUp .18s ease;max-height:90vh;overflow-y:auto}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:18px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.form-field{margin-bottom:12px}
+.form-field label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:4px}
+.form-field input,.form-field select,.form-field textarea{width:100%;padding:8px 10px;font-size:13px;border:1px solid var(--border);border-radius:var(--rad);background:var(--bg);color:var(--text);outline:none;transition:border .13s;font-family:inherit}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{border-color:var(--accent)}
+.form-field textarea{resize:vertical;min-height:65px}
+.form-section-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 10px;padding-top:14px;border-top:1px solid var(--border)}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--border)}
+.empty{text-align:center;padding:40px 20px;color:var(--text3)}
+.empty-icon{font-size:32px;margin-bottom:10px}
+.toast{position:fixed;bottom:22px;right:22px;background:#1a1a18;color:white;padding:9px 16px;border-radius:var(--rad);font-size:13px;z-index:999;animation:fadeUp .18s ease}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+@media(max-width:800px){
+  .nav{width:54px}
+  .nav-brand span,.nav-item span,.nav-section{display:none}
+  .nav-item{justify-content:center;padding:8px}
+  .main{margin-left:54px;padding:14px}
+  .metrics{grid-template-columns:repeat(2,1fr)}
+  .grid-2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="nav">
+    <div class="nav-brand"><div class="brand-dot">N</div><span>NovaCRM</span></div>
+    <div class="nav-section">Principal</div>
+    <div class="nav-item active" onclick="show('dashboard')" id="nav-dashboard"><span style="width:18px;text-align:center">📊</span><span>Dashboard</span></div>
+    <div class="nav-item" onclick="show('contactos')" id="nav-contactos"><span style="width:18px;text-align:center">👤</span><span>Contactos</span></div>
+    <div class="nav-item" onclick="show('pipeline')" id="nav-pipeline"><span style="width:18px;text-align:center">📈</span><span>Pipeline</span></div>
+    <div class="nav-item" onclick="show('actividades')" id="nav-actividades"><span style="width:18px;text-align:center">⏰</span><span>Actividades</span></div>
+    <div class="nav-section">Equipo</div>
+    <div class="nav-item" onclick="show('vendedores')" id="nav-vendedores"><span style="width:18px;text-align:center">🧑‍💼</span><span>Vendedores</span></div>
+    <div class="nav-section">Sistema</div>
+    <div class="nav-item" onclick="show('configuracion')" id="nav-configuracion"><span style="width:18px;text-align:center">⚙️</span><span>Configuración</span></div>
+    <div class="nav-spacer"></div>
+    <div class="nav-footer">
+      <div class="nav-user">
+        <div class="nav-av">CRM</div>
+        <div style="flex:1;overflow:hidden"><div style="font-size:12px;font-weight:500">Mi CRM</div><div style="font-size:11px;color:var(--text3)">Admin</div></div>
+      </div>
+    </div>
+  </nav>
+  <main class="main" id="mc"></main>
+</div>
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <p class="modal-title" id="mt"></p>
+    <div id="mb"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="if(window._schedClose){window._schedClose();window._schedClose=null;}else{closeModal();}">Cancelar</button>
+      <button class="btn btn-accent" onclick="saveModal()">Guardar</button>
+    </div>
+  </div>
+</div>
+<script>
+const K={c:'nc_c2',d:'nc_d5',a:'nc_a2',s:'nc_s5',v:'nc_v2',lr:'nc_lr2',kpi:'nc_kpi2'};
+const DC=[
+  {id:1,name:'Laura Méndez',company:'Grupo Alfa',email:'laura@alfa.mx',phone:'81-2200-0011',status:'Cliente',value:48000,notes:''},
+  {id:2,name:'Carlos Rivera',company:'TechNova SA',email:'crivera@technova.com',phone:'55-3100-4422',status:'Prospecto',value:22000,notes:''},
+  {id:3,name:'Ana Gutiérrez',company:'Inversiones MX',email:'ana.g@invmx.com',phone:'33-4400-9900',status:'Cliente',value:75000,notes:''},
+  {id:4,name:'Diego Torres',company:'Constructora Reyes',email:'dtorres@reyes.mx',phone:'81-9900-1122',status:'Interesado',value:31000,notes:''},
+  {id:5,name:'Sofía Leal',company:'Moda Plus',email:'sofia@modaplus.mx',phone:'55-7788-3300',status:'Prospecto',value:12000,notes:''},
+];
+const DS=[
+  {name:'1. Prospecto General',prob:10},{name:'2. Prospecto Calificado',prob:25},
+  {name:'3. Visita Pendiente',prob:40},{name:'4. Info Pendiente',prob:55},
+  {name:'5. Cotizacion Enviada',prob:70},{name:'6. Ganada',prob:100},{name:'Stand BY',prob:20},{name:'Perdida',prob:0}
+];
+const DD=[
+  {id:1,name:'Reduccion liquidos conf',company:'Quaker Houghton',value:0,prob:55,stage:'4. Info Pendiente',seller:'Eduardo',status:'open',date:'2025-03-02',closedDate:null,lossReason:'',followUpDate:'2026-03-09',followUpDesc:'PTAR no funciona y confinan liquidos, preguntar cuanta agua confinan',followUpType:'call'},
+  {id:2,name:'Recuperacion acido o sosa',company:'Deacero Chely',value:0,prob:55,stage:'4. Info Pendiente',seller:'Eduardo',status:'open',date:'2025-03-02',closedDate:null,lossReason:'',followUpDate:'2026-03-09',followUpDesc:'ver proyecto para recuperacion de acido o sosa en decapad',followUpType:'call'},
+  {id:3,name:'Confinamiento liquidos',company:'Lacteos la Capilla',value:0,prob:55,stage:'4. Info Pendiente',seller:'Eduardo',status:'open',date:'2026-03-18',closedDate:null,lossReason:'',followUpDate:'2026-02-10',followUpDesc:'Mont confinamiento - Analisis fisico quimico',followUpType:'call'},
+  {id:4,name:'Cambio de material filtrante',company:'Stellantis Truck',value:0,prob:55,stage:'4. Info Pendiente',seller:'Eduardo',status:'open',date:'2026-03-05',closedDate:null,lossReason:'',followUpDate:'2026-03-18',followUpDesc:'Enviar fotos del equipo',followUpType:'email'},
+  {id:5,name:'Recuperacion agua',company:'Stabilus',value:0,prob:55,stage:'4. Info Pendiente',seller:'Eduardo',status:'open',date:'2025-08-26',closedDate:null,lossReason:'',followUpDate:'2026-03-20',followUpDesc:'PTA 1: 800M3 PIPA, PTA 2 1798 M3 PIPA',followUpType:'call'},
+  {id:6,name:'resuso agua',company:'Nemak Mty',value:0,prob:55,stage:'4. Info Pendiente',seller:'Eduardo',status:'open',date:'2025-10-28',closedDate:null,lossReason:'',followUpDate:'2026-04-01',followUpDesc:'cita el dia 28/10 3pm, SE ENVIO NDA',followUpType:'meet'},
+  {id:7,name:'Rehabilitacion PTAR',company:'Borgwarner',value:0,prob:55,stage:'4. Info Pendiente',seller:'Eduardo',status:'open',date:'2025-02-19',closedDate:null,lossReason:'',followUpDate:'2026-03-17',followUpDesc:'Modificaciones PTAR',followUpType:'call'},
+  {id:8,name:'Reuso agua rechazos',company:'Stellantis Truck',value:0,prob:55,stage:'4. Info Pendiente',seller:'Eduardo',status:'open',date:'2026-02-26',closedDate:null,lossReason:'',followUpDate:'2026-03-27',followUpDesc:'minimizar agua a lago de evaporacion - PDTE: Analisis FQ',followUpType:'call'},
+  {id:9,name:'Renta dispensadores',company:'Penoles',value:0,prob:55,stage:'4. Info Pendiente',seller:'David Lopez',status:'open',date:'2025-10-09',closedDate:null,lossReason:'',followUpDate:'2026-03-20',followUpDesc:'SE ENVIO INFORMACION POR CORREO',followUpType:'email'},
+  {id:10,name:'Osmosis para comedor',company:'Linamar',value:0,prob:55,stage:'4. Info Pendiente',seller:'David Lopez',status:'open',date:'2025-10-06',closedDate:null,lossReason:'',followUpDate:'2026-03-25',followUpDesc:'SE ENVIO CORREO A nancy.cordova@linamar.com',followUpType:'email'},
+  {id:11,name:'servicio caldera',company:'Lear Ramos Arizpe',value:0,prob:40,stage:'3. Visita Pendiente',seller:'Eduardo',status:'open',date:'2026-01-29',closedDate:null,lossReason:'',followUpDate:'2026-02-10',followUpDesc:'son 48 calderitas',followUpType:'meet'},
+  {id:12,name:'Poliza equipos',company:'Mubea Planta II',value:0,prob:40,stage:'3. Visita Pendiente',seller:'Eduardo',status:'open',date:'2025-02-10',closedDate:null,lossReason:'',followUpDate:'2026-04-01',followUpDesc:'Pdte realizar visita',followUpType:'meet'},
+  {id:13,name:'Cambio de 180 membranas',company:'Deacero',value:0,prob:40,stage:'3. Visita Pendiente',seller:'Eduardo',status:'open',date:'2026-02-17',closedDate:null,lossReason:'',followUpDate:'2026-03-25',followUpDesc:'pdte analisis entrada agua',followUpType:'meet'},
+  {id:14,name:'Cambio de inhibidor',company:'Deacero',value:0,prob:40,stage:'3. Visita Pendiente',seller:'Eduardo',status:'open',date:'2026-02-17',closedDate:null,lossReason:'',followUpDate:'2026-03-25',followUpDesc:'pdte analisis entrada agua',followUpType:'meet'},
+  {id:15,name:'Poliza torres y osmosis',company:'Arcelor Mittal',value:0,prob:40,stage:'3. Visita Pendiente',seller:'Eduardo',status:'open',date:'2026-01-12',closedDate:null,lossReason:'',followUpDate:'2026-03-13',followUpDesc:'Licitacion se abre en Abril',followUpType:'meet'},
+  {id:16,name:'Reuso agua',company:'Stellantis Motores Nte',value:0,prob:40,stage:'3. Visita Pendiente',seller:'Eduardo',status:'open',date:'2026-02-10',closedDate:null,lossReason:'',followUpDate:'2026-04-02',followUpDesc:'Seguimiento personal presentar Motores Norte',followUpType:'meet'},
+  {id:17,name:'dispensador + enfriador',company:'Caterpillar',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2026-01-29',closedDate:null,lossReason:'',followUpDate:'2026-03-03',followUpDesc:'Ricardo Bretado',followUpType:'call'},
+  {id:18,name:'Rehabilitacion',company:'Lear Ramos Arizpe',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Bretado',status:'open',date:'2025-09-11',closedDate:null,lossReason:'',followUpDate:'2026-03-26',followUpDesc:'Pendiente ricardo confirmar refacciones',followUpType:'call'},
+  {id:19,name:'Poliza Osmosis 3',company:'Caterpillar',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2025-10-01',closedDate:null,lossReason:'',followUpDate:'2026-01-08',followUpDesc:'',followUpType:''},
+  {id:20,name:'Recuperacion Agua',company:'Plastic Omnium',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2025-08-26',closedDate:null,lossReason:'',followUpDate:'2026-04-01',followUpDesc:'Cotizar recuperacion de 600 m3/mes',followUpType:'call'},
+  {id:21,name:'poliza osmosis',company:'Emerson Ramos Arizpe',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2026-01-28',closedDate:null,lossReason:'',followUpDate:'2026-03-25',followUpDesc:'',followUpType:''},
+  {id:22,name:'ptar',company:'Joyson Safety',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2026-03-05',closedDate:null,lossReason:'',followUpDate:'2026-01-30',followUpDesc:'Poliza PTAR',followUpType:'call'},
+  {id:23,name:'Recuperacion Agua',company:'Sigma Santa Catarina',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2025-08-26',closedDate:null,lossReason:'',followUpDate:'2026-01-30',followUpDesc:'Cotizar recuperacion venta',followUpType:'call'},
+  {id:24,name:'Tanque agua producto',company:'Sigma Santa Catarina',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2026-02-18',closedDate:null,lossReason:'',followUpDate:'2026-02-25',followUpDesc:'',followUpType:''},
+  {id:25,name:'Automatizacion',company:'Stellantis Truck',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2026-02-16',closedDate:null,lossReason:'',followUpDate:'2026-03-03',followUpDesc:'Automatizacion de 3 equipos de osmosis',followUpType:'call'},
+  {id:26,name:'Filtro Zeolita',company:'Nidec mty',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2026-03-13',closedDate:null,lossReason:'',followUpDate:'2026-03-03',followUpDesc:'Edgar: venta filtro zeolita',followUpType:'call'},
+  {id:27,name:'Poliza Torres',company:'Blackhawk',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2025-09-11',closedDate:null,lossReason:'',followUpDate:'2026-04-04',followUpDesc:'',followUpType:''},
+  {id:28,name:'Poliza Chiller 3',company:'MartinRea',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2026-03-05',closedDate:null,lossReason:'',followUpDate:'2026-03-26',followUpDesc:'',followUpType:''},
+  {id:29,name:'Poliza OI',company:'Joyson Safety',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2025-08-26',closedDate:null,lossReason:'',followUpDate:'2026-03-27',followUpDesc:'',followUpType:''},
+  {id:30,name:'UF + OI',company:'Bayer Chiapas',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2025-12-10',closedDate:null,lossReason:'',followUpDate:'2026-04-04',followUpDesc:'Reuso agua',followUpType:'call'},
+  {id:31,name:'Trat quim chiller',company:'Mabe',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2025-09-09',closedDate:null,lossReason:'',followUpDate:'2026-04-04',followUpDesc:'Cotizar 4t,1v Medianas Plasticos, 2t,1v Chicas',followUpType:'call'},
+  {id:32,name:'Torres Enfriamiento',company:'Tupy Salitllo',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2025-01-05',closedDate:null,lossReason:'',followUpDate:'2026-03-26',followUpDesc:'',followUpType:''},
+  {id:33,name:'Osmosis Inversa',company:'Mahle Santa Catarina',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2026-02-19',closedDate:null,lossReason:'',followUpDate:'2026-03-26',followUpDesc:'Equipo',followUpType:'call'},
+  {id:34,name:'Recuperacion Agua - RAZ',company:'Linde',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2025-08-26',closedDate:null,lossReason:'',followUpDate:'2026-04-27',followUpDesc:'Pendiente: Descarga, suministro, basin, cantidad purga',followUpType:'call'},
+  {id:35,name:'Recuperacion Agua',company:'Nova Steel',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2025-08-26',closedDate:null,lossReason:'',followUpDate:'2026-03-13',followUpDesc:'',followUpType:''},
+  {id:36,name:'Tratamiento Torre ENF',company:'Nova Steel',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2025-08-26',closedDate:null,lossReason:'',followUpDate:'2026-03-13',followUpDesc:'Se envio cotizacion',followUpType:'call'},
+  {id:37,name:'Poliza OI',company:'Sanden',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2025-08-26',closedDate:null,lossReason:'',followUpDate:'2026-03-28',followUpDesc:'',followUpType:''},
+  {id:38,name:'Cotiar OI + Desmin',company:'Adler Pelzer',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2025-08-28',closedDate:null,lossReason:'',followUpDate:'2026-05-17',followUpDesc:'Cotizar OI + Desmin para 10 m3/dia conductividad < 10 uS/cm',followUpType:'call'},
+  {id:39,name:'Poliza Osmosis',company:'Borgwarner',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2026-03-06',closedDate:null,lossReason:'',followUpDate:'2026-03-18',followUpDesc:'',followUpType:''},
+  {id:40,name:'Telemetria',company:'HNI',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2026-03-12',closedDate:null,lossReason:'',followUpDate:'2026-03-19',followUpDesc:'',followUpType:''},
+  {id:41,name:'Suavizador',company:'HNI',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2026-03-12',closedDate:null,lossReason:'',followUpDate:'2026-03-19',followUpDesc:'',followUpType:''},
+  {id:42,name:'Chiller 3',company:'MARTIN REA FMG',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2026-03-12',closedDate:null,lossReason:'',followUpDate:'2026-03-19',followUpDesc:'Poliza Chiller 3',followUpType:'call'},
+  {id:43,name:'Recuperacion agua',company:'Marelli',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2025-03-18',closedDate:null,lossReason:'',followUpDate:'2026-03-16',followUpDesc:'400 m3/mes, agua de ciudad, tiene desmineralizador',followUpType:'call'},
+  {id:44,name:'Chiller',company:'Cat Nvo Laredo',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Cesar',status:'open',date:'2025-08-28',closedDate:null,lossReason:'',followUpDate:'2026-02-26',followUpDesc:'',followUpType:''},
+  {id:45,name:'Mantenimiento equipos',company:'Symrise',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2025-08-26',closedDate:null,lossReason:'',followUpDate:'2026-02-26',followUpDesc:'',followUpType:''},
+  {id:46,name:'Operacion PTAR',company:'Deacero Alambras',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2026-01-08',closedDate:null,lossReason:'',followUpDate:'2026-01-13',followUpDesc:'SILVER',followUpType:'call'},
+  {id:47,name:'Medidores',company:'Caterpillar',value:0,prob:70,stage:'5. Cotizacion Enviada',seller:'Eduardo',status:'open',date:'2026-02-26',closedDate:null,lossReason:'',followUpDate:'2026-03-17',followUpDesc:'',followUpType:''},
+  {id:48,name:'Recuperacion Agua',company:'Quaker Houghton',value:0,prob:20,stage:'Stand BY',seller:'Eduardo',status:'open',date:'2025-08-26',closedDate:null,lossReason:'',followUpDate:null,followUpDesc:'Recuperar agua',followUpType:''},
+  {id:49,name:'Sigma Corporativo',company:'Sigma Corporativo',value:0,prob:20,stage:'Stand BY',seller:'Eduardo',status:'open',date:'2025-09-18',closedDate:null,lossReason:'',followUpDate:null,followUpDesc:'',followUpType:''},
+  {id:50,name:'Osmosis',company:'Deacero',value:0,prob:20,stage:'Stand BY',seller:'Eduardo',status:'open',date:'2025-08-26',closedDate:null,lossReason:'',followUpDate:null,followUpDesc:'',followUpType:''},
+  {id:51,name:'POLIZAS DE MANTTO.',company:'FRISA',value:0,prob:20,stage:'Stand BY',seller:'Eduardo',status:'open',date:'2025-12-10',closedDate:null,lossReason:'',followUpDate:null,followUpDesc:'SE EVIO CORREOS, SOLICITARON UNA COTIZACION DE VARIOS SERVICIOS',followUpType:''},
+  {id:52,name:'Filracion para lineas generales',company:'HNI',value:0,prob:20,stage:'Stand BY',seller:'Eduardo',status:'open',date:'2025-10-28',closedDate:null,lossReason:'',followUpDate:null,followUpDesc:'TIENE INCRUSTACION EN TUBERIAS DE SERVICIOS GRALES.',followUpType:''},
+  {id:53,name:'Renovacion Poliza',company:'Emerson Acuna',value:0,prob:100,stage:'6. Ganada',seller:'Eduardo',status:'won',date:'2026-01-15',closedDate:'2026-01-15',lossReason:'',followUpDate:null,followUpDesc:'',followUpType:''},
+  {id:54,name:'membranas',company:'HNI',value:0,prob:100,stage:'6. Ganada',seller:'Eduardo',status:'won',date:'2026-01-28',closedDate:'2026-01-28',lossReason:'',followUpDate:null,followUpDesc:'',followUpType:''},
+  {id:55,name:'Renovacion Poliza Chiller',company:'HNI',value:0,prob:100,stage:'6. Ganada',seller:'Eduardo',status:'won',date:'2026-01-28',closedDate:'2026-01-28',lossReason:'',followUpDate:null,followUpDesc:'',followUpType:''},
+  {id:56,name:'Renovacion Poliza',company:'Magna Saltillo',value:0,prob:100,stage:'6. Ganada',seller:'Eduardo',status:'won',date:'2026-01-15',closedDate:'2026-01-15',lossReason:'',followUpDate:null,followUpDesc:'',followUpType:''},
+  {id:57,name:'Tratamiento quim osmosis',company:'Linde',value:0,prob:100,stage:'6. Ganada',seller:'Eduardo',status:'won',date:'2025-09-05',closedDate:'2025-09-05',lossReason:'',followUpDate:null,followUpDesc:'',followUpType:''},
+  {id:58,name:'Membranas + Zeolita',company:'Linde',value:0,prob:100,stage:'6. Ganada',seller:'Eduardo',status:'won',date:'2025-09-11',closedDate:'2025-09-11',lossReason:'',followUpDate:null,followUpDesc:'',followUpType:''},
+  {id:59,name:'12 membranas 4x40',company:'Penoles',value:0,prob:100,stage:'6. Ganada',seller:'Bretado',status:'won',date:'2025-09-11',closedDate:'2025-09-11',lossReason:'',followUpDate:null,followUpDesc:'',followUpType:''},
+  {id:60,name:'2 membranas 4x40',company:'Corona',value:0,prob:100,stage:'6. Ganada',seller:'Eduardo',status:'won',date:'2025-09-10',closedDate:'2025-09-10',lossReason:'',followUpDate:null,followUpDesc:'',followUpType:''},
+  {id:61,name:'Poliza osmosis comedor',company:'Macimex Ramos Arizpe',value:0,prob:100,stage:'6. Ganada',seller:'Eduardo',status:'won',date:'2025-10-06',closedDate:'2025-10-06',lossReason:'',followUpDate:null,followUpDesc:'',followUpType:''},
+  {id:62,name:'POLIZA OSMOSIS INVERSA',company:'HNI',value:0,prob:100,stage:'6. Ganada',seller:'Eduardo',status:'won',date:'2025-11-27',closedDate:'2025-11-27',lossReason:'',followUpDate:null,followUpDesc:'',followUpType:''},
+  {id:63,name:'Poliza Mnatenimiento Osmosis',company:'Nidec mty',value:0,prob:100,stage:'6. Ganada',seller:'Eduardo',status:'won',date:'2025-11-06',closedDate:'2025-11-06',lossReason:'',followUpDate:null,followUpDesc:'',followUpType:''},
+  {id:64,name:'Recuperacion Agua',company:'Quifa',value:0,prob:0,stage:'Perdida',seller:'Eduardo',status:'lost',date:'2025-08-26',closedDate:'2025-08-26',lossReason:'Perdida',followUpDate:null,followUpDesc:'Pdte: rechazo de ambos osmosis',followUpType:''},
+  {id:65,name:'Ahorro agua',company:'RegalRexnord',value:0,prob:0,stage:'Perdida',seller:'Eduardo',status:'lost',date:'2025-08-28',closedDate:'2025-08-28',lossReason:'Perdida',followUpDate:null,followUpDesc:'',followUpType:''},
+  {id:66,name:'Poliza Osmosis y Chillers',company:'Turck Arteaga',value:0,prob:0,stage:'Perdida',seller:'Eduardo',status:'lost',date:'2025-09-30',closedDate:'2025-09-30',lossReason:'Perdida',followUpDate:null,followUpDesc:'Poliza OI',followUpType:''},
+  {id:67,name:'Poliza PTAR',company:'Deacero Fino',value:0,prob:0,stage:'Perdida',seller:'Eduardo',status:'lost',date:'2026-01-12',closedDate:'2026-01-12',lossReason:'Perdida',followUpDate:null,followUpDesc:'gENESIS',followUpType:''},
+  {id:68,name:'Poliza Osmosis',company:'Lear Arteaga',value:0,prob:0,stage:'Perdida',seller:'Eduardo',status:'lost',date:'2025-11-18',closedDate:'2025-11-18',lossReason:'Perdida',followUpDate:null,followUpDesc:'Se envio alcance de poliza por correo',followUpType:''},
+];
+const DA=[
+  {id:1,type:'call',title:'Llamada con Laura Méndez',desc:'Seguimiento propuesta Q2',time:'Hace 30 min',contactName:'Laura Méndez',date:'2025-03-18'},
+  {id:2,type:'meet',title:'Reunión con Diego Torres',desc:'Presentación de soluciones',time:'Hoy 11:00',contactName:'Diego Torres',date:'2025-03-18'},
+];
+function ld(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}}
+function sv(k,d){try{localStorage.setItem(k,JSON.stringify(d))}catch{}}
+let contacts=ld(K.c,DC),deals=ld(K.d,DD),activities=ld(K.a,DA);
+let stages=ld(K.s,DS),sellers=ld(K.v,['Eduardo','David Lopez','Cesar','Bretado']),lossReasons=ld(K.lr,['Precio alto','Competencia','Sin presupuesto','Proyecto cancelado','Sin respuesta']);
+if(stages.length&&typeof stages[0]==='string'){const p={Inicial:10,Contactado:25,Propuesta:50,'Negociación':75,Cerrado:100};stages=stages.map(s=>({name:s,prob:p[s]||50}));}
+deals.forEach(d=>{if(!d.status)d.status='open';if(!d.lossReason)d.lossReason='';if(d.followUpDate===undefined)d.followUpDate=null;if(!d.followUpDesc)d.followUpDesc='';if(!d.followUpType)d.followUpType='';if(!d.seller)d.seller='';if(!d.periodicity)d.periodicity=7;});
+activities.forEach(a=>{if(a.done===undefined)a.done=false;if(!a.dealId)a.dealId=null;});;
+function saveAll(){sv(K.c,contacts);sv(K.d,deals);sv(K.a,activities);sv(K.s,stages);sv(K.v,sellers);sv(K.lr,lossReasons);}
+
+// ─── KPI TRACKING ───
+function thisMonth(){const n=new Date();return`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`;}
+function getKPI(){return ld(K.kpi,{advances:0,toCotiz:0,month:thisMonth()});}
+function resetKPIIfNewMonth(){let k=getKPI();if(k.month!==thisMonth()){k={advances:0,toCotiz:0,month:thisMonth()};sv(K.kpi,k);}return k;}
+function trackAdvance(toStage){const k=resetKPIIfNewMonth();k.advances++;if(toStage&&toStage.toLowerCase().includes('cotiz'))k.toCotiz++;sv(K.kpi,k);}
+const AVC=['av-0','av-1','av-2','av-3','av-4','av-5'];
+const STC=['bg-gray','bg-blue','bg-amber','bg-amber','bg-green','bg-teal','bg-purple'];
+const SC={Cliente:'bg-teal',Prospecto:'bg-blue',Interesado:'bg-amber',Inactivo:'bg-gray'};
+const AI={call:'📞',email:'✉️',meet:'📅',note:'📝'};
+const AL={call:'Llamada con',email:'Email a',meet:'Reunión con',note:'Nota:'};
+const ini=n=>n.split(' ').map(x=>x[0]).join('').substring(0,2).toUpperCase();
+const avc=n=>AVC[n.charCodeAt(0)%AVC.length];
+const fmt=v=>'$'+(v||0).toLocaleString('es-MX');
+const nid=arr=>arr.length?Math.max(...arr.map(x=>x.id))+1:1;
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const gsi=name=>stages.findIndex(s=>s.name===name);
+const gsc=name=>{const i=gsi(name);return STC[Math.min(Math.max(i,0),STC.length-1)];};
+const td0=()=>{const d=new Date();d.setHours(0,0,0,0);return d;};
+let pg='dashboard',q='',fSt='Todos',fSel='Todos',cfgTab='vendedores',showClosed=false,mFn=null;
+let dSeller='Todos',dDateFrom='',dDateTo='',actTab='pending';
+function show(p){pg=p;q='';fSt='Todos';fSel='Todos';document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));const el=document.getElementById('nav-'+p);if(el)el.classList.add('active');render();}
+function render(){
+  const mc=document.getElementById('mc');
+  if(pg==='dashboard')mc.innerHTML=rDash();
+  else if(pg==='contactos')mc.innerHTML=rContacts();
+  else if(pg==='pipeline')mc.innerHTML=rPipeline();
+  else if(pg==='actividades')mc.innerHTML=rActs();
+  else if(pg==='vendedores')mc.innerHTML=rVendedores();
+  else if(pg==='configuracion')mc.innerHTML=rConfig();
+}
+function rDash(){
+  // ─── Filtros del dashboard ───
+  const inRange=(d)=>{
+    const date=d.date||'';
+    if(dDateFrom&&date<dDateFrom)return false;
+    if(dDateTo&&date>dDateTo)return false;
+    return true;
+  };
+  const bySeller=(d)=>dSeller==='Todos'||d.seller===dSeller;
+
+  // Dataset filtrado
+  const allF=deals.filter(d=>bySeller(d)&&inRange(d));
+  const open=allF.filter(d=>d.status==='open');
+  const won=allF.filter(d=>d.status==='won');
+  const closed=allF.filter(d=>d.status!=='open');
+  const pipe=open.reduce((s,d)=>s+(d.value||0),0);
+  const fc=open.reduce((s,d)=>s+(d.value||0)*(d.prob||0)/100,0);
+  const conv=closed.length?(won.length/closed.length*100).toFixed(0):0;
+
+  // Forecast por etapa
+  const fbs=stages.map(st=>{
+    const sd=open.filter(d=>d.stage===st.name);
+    return{name:st.name,w:sd.reduce((s,d)=>s+(d.value||0)*(d.prob||st.prob)/100,0),t:sd.reduce((s,d)=>s+(d.value||0),0)};
+  }).filter(s=>s.t>0);
+  const mxF=Math.max(...fbs.map(s=>s.w),1);
+
+  // KPIs — aplican el filtro de vendedor y fecha
+  const kpi=resetKPIIfNewMonth();
+  const actsF=activities.filter(a=>dSeller==='Todos'||a.contactName&&sellers.indexOf(dSeller)>-1||true);
+  // para visitas filtramos por fecha si se indica
+  const visitas=activities.filter(a=>{
+    if(a.type!=='meet')return false;
+    if(!a.date)return false;
+    if(dDateFrom&&a.date<dDateFrom)return false;
+    if(dDateTo&&a.date>dDateTo)return false;
+    return true;
+  }).length;
+  const nuevos=allF.length;
+  const enCotiz=open.filter(d=>d.stage&&d.stage.toLowerCase().includes('cotiz')).length;
+  const meses=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const mesNom=meses[new Date().getMonth()]+' '+new Date().getFullYear();
+
+  // Tratos recientes y actividades recientes
+  const rd=[...allF].reverse().slice(0,5);
+  const ra=[...activities].reverse().slice(0,6);
+
+  const isFiltered=dSeller!=='Todos'||dDateFrom||dDateTo;
+
+  return`
+  <div class="page-header">
+    <div><p class="page-title">Dashboard</p><p class="page-subtitle">${new Date().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'})}</p></div>
+  </div>
+
+  <!-- FILTROS DEL DASHBOARD -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rad-lg);padding:14px 18px;margin-bottom:16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <span style="font-size:12px;font-weight:600;color:var(--text3)">🔽 Filtrar por:</span>
+    <div style="display:flex;align-items:center;gap:6px">
+      <label style="font-size:12px;color:var(--text2);font-weight:500">Vendedor</label>
+      <select onchange="dSeller=this.value;render()" style="padding:6px 10px;font-size:12px;border:1px solid var(--border);border-radius:var(--rad);background:var(--bg);color:var(--text);outline:none">
+        <option value="Todos" ${dSeller==='Todos'?'selected':''}>Todos</option>
+        ${sellers.map(s=>`<option value="${esc(s)}" ${dSeller===s?'selected':''}>${esc(s)}</option>`).join('')}
+      </select>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <label style="font-size:12px;color:var(--text2);font-weight:500">Desde</label>
+      <input type="date" value="${dDateFrom}" onchange="dDateFrom=this.value;render()" style="padding:6px 10px;font-size:12px;border:1px solid var(--border);border-radius:var(--rad);background:var(--bg);color:var(--text);outline:none">
+    </div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <label style="font-size:12px;color:var(--text2);font-weight:500">Hasta</label>
+      <input type="date" value="${dDateTo}" onchange="dDateTo=this.value;render()" style="padding:6px 10px;font-size:12px;border:1px solid var(--border);border-radius:var(--rad);background:var(--bg);color:var(--text);outline:none">
+    </div>
+    ${isFiltered?`<button class="btn btn-sm" onclick="dSeller='Todos';dDateFrom='';dDateTo='';render()">✕ Limpiar filtros</button>`:''}
+    ${isFiltered?`<span style="font-size:12px;color:var(--accent);font-weight:500">${allF.length} tratos filtrados</span>`:''}
+  </div>
+
+  <!-- KPIs DEL MES -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rad-lg);padding:16px 20px;margin-bottom:16px;box-shadow:var(--shadow)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">📊 Indicadores — ${isFiltered?'Filtro aplicado':mesNom}</div>
+      <button class="btn btn-sm" onclick="if(confirm('¿Resetear contadores de movimientos?')){sv(K.kpi,{advances:0,toCotiz:0,month:thisMonth()});render();toast('Contadores reseteados');}">↺ Resetear</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+      <div style="background:var(--surface2);border-radius:var(--rad);padding:14px 16px;border-left:3px solid #378add">
+        <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">📅 Visitas realizadas</div>
+        <div style="font-size:28px;font-weight:700;color:#185fa5;line-height:1">${visitas}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">${dDateFrom||dDateTo?'en el periodo':'este mes'}</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:var(--rad);padding:14px 16px;border-left:3px solid var(--accent)">
+        <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">➕ Oportunidades</div>
+        <div style="font-size:28px;font-weight:700;color:var(--accent-dark);line-height:1">${nuevos}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">${isFiltered?'en filtro actual':'total pipeline'}</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:var(--rad);padding:14px 16px;border-left:3px solid #ef9f27">
+        <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">⬆️ Tratos avanzados</div>
+        <div style="font-size:28px;font-weight:700;color:#633806;line-height:1">${kpi.advances}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">movimientos de etapa</div>
+      </div>
+      <div style="background:#e6f1fb;border-radius:var(--rad);padding:14px 16px;border-left:3px solid #185fa5">
+        <div style="font-size:10px;color:#0c447c;font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">📋 En Cotización</div>
+        <div style="font-size:28px;font-weight:700;color:#0c447c;line-height:1">${enCotiz}</div>
+        <div style="font-size:11px;color:#185fa5;margin-top:4px">tratos activos${isFiltered?' (filtro)':''}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MÉTRICAS GENERALES -->
+  <div class="metrics">
+    <div class="metric"><div class="metric-label">Pipeline abierto</div><div class="metric-value">${fmt(pipe)}</div><div class="metric-sub">${open.length} tratos activos</div></div>
+    <div class="metric accent"><div class="metric-label">⚡ Forecast</div><div class="metric-value">${fmt(Math.round(fc))}</div><div class="metric-sub">valor × probabilidad</div></div>
+    <div class="metric"><div class="metric-label">Ganados</div><div class="metric-value">${won.length}</div><div class="metric-sub">conv. ${conv}% · ${closed.length} cerrados</div></div>
+  </div>
+
+  ${fbs.length?`<div class="forecast-section"><div class="forecast-title">Forecast por etapa${isFiltered?' (filtrado)':''}</div>${fbs.map(s=>`<div class="forecast-row"><div class="forecast-label">${esc(s.name)}</div><div class="forecast-bar-wrap"><div class="forecast-bar-fill" style="width:${Math.round(s.w/mxF*100)}%"></div></div><div class="forecast-val">${fmt(Math.round(s.w))}</div></div>`).join('')}</div>`:''}
+
+  <div class="grid-2">
+    <div class="card"><div class="card-pad"><div class="card-title">Tratos recientes${isFiltered?' (filtrado)':''}</div><div class="tbl-wrap"><table><thead><tr><th>Trato</th><th>Empresa</th><th>Vendedor</th><th>Etapa</th></tr></thead><tbody>
+    ${rd.length?rd.map(d=>`<tr>
+      <td><div style="font-weight:500;font-size:12px">${esc(d.name)}</div></td>
+      <td style="color:var(--text3);font-size:11px">${esc(d.company)}</td>
+      <td style="font-size:11px">${d.seller?`<span class="badge bg-gray">${esc(d.seller)}</span>`:'-'}</td>
+      <td><span class="badge ${gsc(d.stage)}" style="font-size:10px">${esc(d.stage)}</span></td>
+    </tr>`).join(''):'<tr><td colspan="4" style="text-align:center;padding:16px;color:var(--text3)">Sin tratos en este filtro</td></tr>'}
+    </tbody></table></div></div></div>
+    <div class="card"><div class="card-pad"><div class="card-title">Últimas actividades</div>
+    ${ra.map(a=>`<div class="act-item" style="padding:8px 0"><div class="act-icon ${a.type}">${AI[a.type]||'📌'}</div><div style="flex:1"><div style="font-size:13px;font-weight:500">${esc(a.title)}</div><div style="font-size:11px;color:var(--text3)">${esc(a.desc)}</div></div><div style="font-size:11px;color:var(--text3)">${a.time}</div></div>`).join('')||'<div class="empty"><div class="empty-icon">⏰</div><p>Sin actividades</p></div>'}
+    </div></div>
+  </div>`;
+}
+function rContacts(){
+  const qL=q.toLowerCase();
+  const list=contacts.filter(c=>(!qL||c.name.toLowerCase().includes(qL)||c.company.toLowerCase().includes(qL)||c.email.toLowerCase().includes(qL))&&(fSt==='Todos'||c.status===fSt));
+  return`<div class="page-header"><div><p class="page-title">Contactos</p><p class="page-subtitle">${contacts.length} contactos</p></div><button class="btn btn-accent" onclick="openNewContact()">+ Nuevo contacto</button></div>
+  <div class="toolbar"><div class="search-wrap"><span class="search-icon">🔍</span><input type="text" placeholder="Buscar..." value="${esc(q)}" oninput="q=this.value;render()"></div>
+  <select class="filter" onchange="fSt=this.value;render()"><option value="Todos">Todos</option><option value="Cliente" ${fSt==='Cliente'?'selected':''}>Clientes</option><option value="Prospecto" ${fSt==='Prospecto'?'selected':''}>Prospectos</option><option value="Interesado" ${fSt==='Interesado'?'selected':''}>Interesados</option><option value="Inactivo" ${fSt==='Inactivo'?'selected':''}>Inactivos</option></select></div>
+  <div class="card"><div class="tbl-wrap"><table><thead><tr><th>Contacto</th><th>Empresa</th><th>Email</th><th>Teléfono</th><th>Estado</th><th>Valor</th><th style="width:80px"></th></tr></thead><tbody>
+  ${list.length?list.map(c=>`<tr>
+    <td><div class="av-row"><div class="av ${avc(c.name)}">${ini(c.name)}</div><span style="font-weight:500">${esc(c.name)}</span></div></td>
+    <td style="color:var(--text3);font-size:12px">${esc(c.company)}</td>
+    <td style="font-size:12px"><a href="mailto:${esc(c.email)}" style="color:var(--accent);text-decoration:none">${esc(c.email)}</a></td>
+    <td style="font-size:12px">${esc(c.phone)}</td>
+    <td><span class="badge ${SC[c.status]||'bg-gray'}">${esc(c.status)}</span></td>
+    <td style="font-weight:600;color:var(--accent-dark)">${fmt(c.value)}</td>
+    <td><div style="display:flex;gap:3px"><button class="btn btn-sm" onclick="editContact(${c.id})">✏️</button><button class="btn btn-sm btn-danger" onclick="deleteContact(${c.id})">🗑️</button></div></td>
+  </tr>`).join(''):'<tr><td colspan="7"><div class="empty"><div class="empty-icon">👤</div><p>Sin resultados</p></div></td></tr>'}
+  </tbody></table></div></div>`;
+}
+function rPipeline(){
+  const vis=showClosed?deals:deals.filter(d=>d.status!=='lost');
+  const fd=fSel==='Todos'?vis:vis.filter(d=>d.seller===fSel);
+  const grp={};stages.forEach(s=>grp[s.name]=[]);fd.forEach(d=>{if(grp[d.stage]!==undefined)grp[d.stage].push(d);});
+  const pipe=fd.filter(d=>d.status==='open').reduce((s,d)=>s+(d.value||0),0);
+  const fc=fd.filter(d=>d.status==='open').reduce((s,d)=>s+(d.value||0)*(d.prob||0)/100,0);
+  return`<div class="page-header">
+    <div><p class="page-title">Pipeline de ventas</p><p class="page-subtitle">${fmt(pipe)} abierto · forecast ${fmt(Math.round(fc))}</p></div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      <button class="btn btn-sm" onclick="showClosed=!showClosed;render()">${showClosed?'Ocultar':'Mostrar'} perdidos</button>
+      <button class="btn btn-sm" onclick="show('configuracion');cfgTab='etapas'">⚙️ Etapas</button>
+      <button class="btn btn-accent" onclick="openNewDeal()">+ Nuevo trato</button>
+    </div>
+  </div>
+  <div class="toolbar"><span style="font-size:13px;color:var(--text3)">Vendedor:</span>
+  <select class="filter" onchange="fSel=this.value;render()"><option value="Todos">Todos</option>${sellers.map(s=>`<option value="${esc(s)}" ${fSel===s?'selected':''}>${esc(s)}</option>`).join('')}</select></div>
+  <div class="pipeline-wrap"><div class="pipeline" style="grid-template-columns:repeat(${stages.length},minmax(170px,1fr))">
+  ${stages.map((st,si)=>{
+    const sd=grp[st.name]||[],sO=sd.filter(d=>d.status==='open');
+    const sF=sO.reduce((s,d)=>s+(d.value||0)*(d.prob||st.prob)/100,0);
+    return`<div class="stage">
+      <div class="stage-head">
+        <span ondblclick="renameStage(this,${si})" style="cursor:pointer;border-radius:3px;padding:1px 3px" title="Doble clic para renombrar" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background=''">${esc(st.name)}</span>
+        <div style="display:flex;align-items:center;gap:3px">
+          <span style="background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:1px 7px;font-size:10px">${sd.length}</span>
+          <button onclick="deleteStage(${si})" class="stage-del-btn" style="background:none;border:none;cursor:pointer;font-size:11px;opacity:0;padding:0 2px;color:var(--text3)">✕</button>
+        </div>
+      </div>
+      <div class="stage-forecast">${fmt(sO.reduce((s,d)=>s+(d.value||0),0))} · fcst ${fmt(Math.round(sF))}</div>
+      ${sd.map(d=>{
+        const canB=si>0&&d.status==='open',canF=si<stages.length-1&&d.status==='open';
+        const td=td0();let fuH='';
+        if(d.followUpDate){
+          const fd2=new Date(d.followUpDate+'T00:00:00'),diff=Math.round((fd2-td)/86400000);
+          if(diff<0)fuH=`<div class="followup overdue">🔴 Vencida ${fd2.toLocaleDateString('es-MX',{day:'2-digit',month:'short'})}${d.followUpDesc?' · '+esc(d.followUpDesc.substring(0,25)):''}</div>`;
+          else if(diff===0)fuH=`<div class="followup today">🟠 Hoy${d.followUpDesc?' · '+esc(d.followUpDesc.substring(0,25)):''}</div>`;
+          else fuH=`<div class="followup upcoming">📅 ${fd2.toLocaleDateString('es-MX',{day:'2-digit',month:'short'})}${d.followUpDesc?' · '+esc(d.followUpDesc.substring(0,25)):''}</div>`;
+        } else if(d.status==='open'){fuH=`<div class="followup none" onclick="editDeal(${d.id})">+ Programar seguimiento</div>`;}
+        const isOD=d.followUpDate&&new Date(d.followUpDate+'T00:00:00')<td&&d.status==='open';
+        const isTd=d.followUpDate&&Math.round((new Date(d.followUpDate+'T00:00:00')-td)/86400000)===0&&d.status==='open';
+        return`<div class="deal-card ${d.status}${isOD?' overdue':''}${isTd?' due-today':''}">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:3px">
+            <div style="flex:1;min-width:0">
+              <div class="deal-name">${esc(d.name)}</div>
+              <div class="deal-co">${esc(d.company)}${d.seller?` <span style="color:var(--text3)">· 👤 ${esc(d.seller)}</span>`:''}</div>
+            </div>
+            <div style="display:flex;gap:2px;flex-shrink:0">
+              <button onclick="editDeal(${d.id})" style="background:none;border:none;cursor:pointer;font-size:12px;padding:2px;opacity:.4" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.4">✏️</button>
+              <button onclick="deleteDeal(${d.id})" style="background:none;border:none;cursor:pointer;font-size:12px;padding:2px;opacity:.4" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.4">🗑️</button>
+            </div>
+          </div>
+          ${d.status==='won'?'<div style="margin-top:4px"><span class="badge bg-green" style="font-size:10px">✓ Ganado</span></div>':d.status==='lost'?`<div style="margin-top:4px"><span class="badge bg-gray" style="font-size:10px">✗ ${esc(d.lossReason||'Perdido')}</span></div>`:''}
+          <div class="deal-val" style="margin-top:5px">${fmt(d.value)}</div>
+          <div class="prob-bar"><div class="prob-fill" style="width:${d.prob||0}%"></div></div>
+          ${fuH}
+          ${d.status==='open'?`<div style="display:flex;justify-content:space-between;align-items:center;margin-top:5px">
+            <span style="font-size:10px;color:var(--text3)">${d.prob||0}% prob.</span>
+            <div style="display:flex;gap:3px">
+              ${canB?`<button onclick="moveDeal(${d.id},-1)" style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:10px;padding:2px 6px;color:var(--text2)">← Atrás</button>`:''}
+              ${canF?`<button onclick="moveDeal(${d.id},1)" style="background:var(--accent-light);border:1px solid #9fe1cb;border-radius:4px;cursor:pointer;font-size:10px;padding:2px 6px;color:var(--accent-dark);font-weight:600">Avanzar →</button>`:''}
+            </div>
+          </div>`:''}
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('')}
+  </div></div>`;
+}
+function rActs(){
+  const pending=activities.filter(a=>!a.done).reverse();
+  const done=activities.filter(a=>a.done).reverse();
+  const filt=actTab==='done'?done:pending;
+  return`<div class="page-header"><div><p class="page-title">Actividades</p><p class="page-subtitle">${pending.length} pendientes · ${done.length} completadas</p></div><button class="btn btn-accent" onclick="openNewActivity()">+ Nueva actividad</button></div>
+  <div style="display:flex;gap:2px;background:var(--surface2);border-radius:var(--rad);padding:3px;width:fit-content;margin-bottom:14px">
+    <div class="tab ${actTab==='pending'?'active':''}" onclick="actTab='pending';render()">⏳ Pendientes (${pending.length})</div>
+    <div class="tab ${actTab==='done'?'active':''}" onclick="actTab='done';render()">✅ Completadas (${done.length})</div>
+  </div>
+  <div class="card"><div class="card-pad">
+  ${filt.length?filt.map(a=>{
+    const deal=a.dealId?deals.find(d=>d.id===a.dealId):null;
+    return`<div class="act-item" style="${a.done?'opacity:.6':''}">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0">
+        <div class="act-icon ${a.type}" style="${a.done?'filter:grayscale(1)':''}">${AI[a.type]||'📌'}</div>
+        ${!a.done?`<button onclick="completeActivity(${a.id})" title="Marcar completada" style="background:none;border:1px solid var(--accent);border-radius:999px;cursor:pointer;font-size:9px;padding:2px 5px;color:var(--accent);font-weight:600;white-space:nowrap">✓ Listo</button>`
+        :`<span style="font-size:9px;color:var(--accent);font-weight:600">✅ Hecha</span>`}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500;${a.done?'text-decoration:line-through;color:var(--text3)':''}">${esc(a.title)}</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px">${esc(a.desc)}${a.contactName?' · <span style="color:var(--accent)">'+esc(a.contactName)+'</span>':''}</div>
+        ${deal?`<div style="font-size:11px;color:var(--text2);margin-top:3px">🏢 ${esc(deal.name)} · ${esc(deal.company)}${deal.periodicity?' · 🔄 cada '+deal.periodicity+' días':''}</div>`:''}
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">${a.time}${a.done&&a.doneAt?' · Completada: '+a.doneAt:''}</div>
+      </div>
+      <button class="btn btn-sm btn-danger" onclick="deleteActivity(${a.id})" style="align-self:flex-start;flex-shrink:0">🗑️</button>
+    </div>`;
+  }).join(''):`<div class="empty"><div class="empty-icon">${actTab==='done'?'✅':'⏰'}</div><p>${actTab==='done'?'Sin actividades completadas':'Sin actividades pendientes'}</p></div>`}
+  </div></div>`;
+}
+function rVendedores(){
+  const cards=sellers.map((s,i)=>{
+    const myD=deals.filter(d=>d.seller===s),myV=myD.reduce((t,d)=>t+(d.value||0),0),myC=myD.filter(d=>d.status==='won').reduce((t,d)=>t+(d.value||0),0);
+    return`<div class="vendor-card">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="av ${avc(s)}" style="width:42px;height:42px;font-size:14px;flex-shrink:0">${ini(s)}</div>
+        <div style="flex:1"><div style="font-weight:600;font-size:15px">${esc(s)}</div><div style="font-size:12px;color:var(--text3)">${myD.length} tratos asignados</div></div>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-sm" onclick="renameSeller(${i})">✏️</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteSeller(${i})">🗑️</button>
+        </div>
+      </div>
+      <div class="vendor-stats">
+        <div class="vendor-stat"><div class="vendor-stat-label">Pipeline</div><div class="vendor-stat-val">${fmt(myV)}</div><div style="font-size:11px;color:var(--text3)">${myD.filter(d=>d.status==='open').length} abiertos</div></div>
+        <div class="vendor-stat accent"><div class="vendor-stat-label">Ganado</div><div class="vendor-stat-val">${fmt(myC)}</div><div style="font-size:11px;color:var(--accent)">${myD.filter(d=>d.status==='won').length} tratos</div></div>
+      </div>
+    </div>`;
+  }).join('');
+  return`<div class="page-header"><div><p class="page-title">Vendedores</p><p class="page-subtitle">${sellers.length} en el equipo</p></div></div>
+  <div class="vendor-grid">${cards||'<p style="color:var(--text3);font-size:13px">Sin vendedores. Agrega el primero abajo.</p>'}</div>
+  <div class="card"><div class="card-pad"><div class="card-title">Agregar vendedor</div>
+  <div style="display:flex;gap:8px"><input id="new-seller" placeholder="Nombre del vendedor" style="flex:1;padding:8px 11px;font-size:13px;border:1px solid var(--border);border-radius:var(--rad);background:var(--surface2);color:var(--text);outline:none" onkeydown="if(event.key==='Enter')addSeller()"><button class="btn btn-accent" onclick="addSeller()">+ Agregar</button></div>
+  </div></div>`;
+}
+function rConfig(){
+  const tabs={vendedores:'👤 Vendedores',etapas:'📋 Etapas',motivos:'❌ Motivos pérdida'};
+  if(!tabs[cfgTab])cfgTab='vendedores';
+  const tabBar='<div class="tab-bar">'+Object.keys(tabs).map(t=>`<div class="tab ${cfgTab===t?'active':''}" onclick="cfgTab='${t}';render()">${tabs[t]}</div>`).join('')+'</div>';
+  let inner='';
+  if(cfgTab==='vendedores'){
+    inner='<p style="font-size:13px;color:var(--text2);margin-bottom:14px">Vendedores disponibles para asignar en el pipeline.</p>'+
+    (sellers.length?sellers.map((s,i)=>`<div class="config-item"><div class="av ${avc(s)}" style="width:28px;height:28px;font-size:10px">${ini(s)}</div><span style="flex:1;font-size:14px;font-weight:500;margin-left:6px">${esc(s)}</span><button class="btn btn-sm" onclick="renameSeller(${i})">✏️ Renombrar</button><button class="btn btn-sm btn-danger" onclick="deleteSeller(${i})">🗑️</button></div>`).join(''):'<p style="color:var(--text3);padding:12px 0">Sin vendedores aún.</p>')+
+    '<div class="config-add"><input id="new-seller" placeholder="Nombre del vendedor" onkeydown="if(event.key===\'Enter\')addSeller()"><button class="btn btn-accent" onclick="addSeller()">+ Agregar</button></div>';
+  } else if(cfgTab==='etapas'){
+    inner='<p style="font-size:13px;color:var(--text2);margin-bottom:4px">Doble clic en el pipeline para renombrar etapas.</p><p style="font-size:12px;color:var(--text3);margin-bottom:14px">La probabilidad define el peso en el forecast.</p>'+
+    stages.map((st,i)=>`<div class="config-item"><span style="flex:1;font-size:14px;font-weight:500">${esc(st.name)}</span><span style="font-size:12px;color:var(--text3)">Prob:</span><input type="number" min="0" max="100" value="${st.prob}" style="width:55px;padding:4px 6px;font-size:12px;border:1px solid var(--border);border-radius:4px;background:var(--bg);text-align:center;outline:none" onchange="stages[${i}].prob=Math.min(100,Math.max(0,parseInt(this.value)||0));saveAll()">${i>0?`<button class="btn btn-sm" onclick="moveStage(${i},-1)">↑</button>`:'<span style="width:36px"></span>'} ${i<stages.length-1?`<button class="btn btn-sm" onclick="moveStage(${i},1)">↓</button>`:'<span style="width:36px"></span>'} <button class="btn btn-sm btn-danger" onclick="deleteStage(${i})">🗑️</button></div>`).join('')+
+    '<div class="config-add"><input id="new-stage" placeholder="Nombre de la etapa" onkeydown="if(event.key===\'Enter\')addStage()"><input type="number" id="new-stage-prob" placeholder="%" min="0" max="100" style="width:90px"><button class="btn btn-accent" onclick="addStage()">+ Agregar</button></div>';
+  } else {
+    inner='<p style="font-size:13px;color:var(--text2);margin-bottom:14px">Razones para marcar un trato como perdido.</p>'+
+    (lossReasons.length?lossReasons.map((r,i)=>`<div class="config-item"><span style="font-size:16px">❌</span><span style="flex:1;font-size:14px;margin-left:6px">${esc(r)}</span><button class="btn btn-sm btn-danger" onclick="delLR(${i})">🗑️</button></div>`).join(''):'<p style="color:var(--text3);padding:12px 0">Sin motivos.</p>')+
+    '<div class="config-add"><input id="new-lr" placeholder="Ej: Precio muy alto" onkeydown="if(event.key===\'Enter\')addLR()"><button class="btn btn-accent" onclick="addLR()">+ Agregar</button></div>';
+  }
+  return`<div class="page-header"><div><p class="page-title">Configuración</p><p class="page-subtitle">Personaliza tu CRM</p></div></div>${tabBar}<div class="config-section">${inner}</div>`;
+}
+// CONFIG
+function addSeller(){const el=document.getElementById('new-seller');if(!el)return;const v=el.value.trim();if(!v){toast('Escribe un nombre');return}if(sellers.includes(v)){toast('Ya existe');return}sellers.push(v);saveAll();render();toast('Vendedor agregado');}
+function deleteSeller(i){const s=sellers[i],n=deals.filter(d=>d.seller===s).length;if(!confirm(n>0?`"${s}" tiene ${n} trato(s). ¿Eliminar?`:`¿Eliminar a "${s}"?`))return;sellers.splice(i,1);saveAll();render();toast('Vendedor eliminado');}
+function renameSeller(i){const n=prompt('Nuevo nombre:',sellers[i]);if(!n||!n.trim())return;const nn=n.trim();if(sellers.includes(nn)&&nn!==sellers[i]){toast('Ya existe');return}const old=sellers[i];deals.forEach(d=>{if(d.seller===old)d.seller=nn;});sellers[i]=nn;saveAll();render();toast('Renombrado');}
+function addStage(){const n=document.getElementById('new-stage').value.trim();if(!n){toast('Escribe un nombre');return}if(stages.find(s=>s.name===n)){toast('Ya existe');return}const p=parseInt(document.getElementById('new-stage-prob').value)||50;stages.push({name:n,prob:p});saveAll();render();toast('Etapa agregada');}
+function deleteStage(i){const n=deals.filter(d=>d.stage===stages[i].name).length;if(!confirm(n>0?`Tiene ${n} trato(s). Se moverán a la primera etapa. ¿Continuar?`:'¿Eliminar etapa?'))return;if(stages.length<=1){toast('Necesitas al menos una etapa');return}const f=stages.find((_,j)=>j!==i);deals.forEach(d=>{if(d.stage===stages[i].name)d.stage=f.name;});stages.splice(i,1);saveAll();render();toast('Etapa eliminada');}
+function moveStage(i,dir){const j=i+dir;if(j<0||j>=stages.length)return;[stages[i],stages[j]]=[stages[j],stages[i]];saveAll();render();}
+function renameStage(el,idx){const old=stages[idx].name;const inp=document.createElement('input');inp.value=old;inp.style.cssText='font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);border:1px solid var(--accent);border-radius:3px;padding:1px 4px;width:85px;background:var(--surface);outline:none';el.replaceWith(inp);inp.focus();inp.select();const commit=()=>{const nn=inp.value.trim();if(nn&&nn!==old){if(stages.find(s=>s.name===nn)){toast('Ya existe');render();return}deals.forEach(d=>{if(d.stage===old)d.stage=nn;});stages[idx].name=nn;saveAll();toast('Etapa renombrada');}render();};inp.addEventListener('blur',commit);inp.addEventListener('keydown',e=>{if(e.key==='Enter')inp.blur();if(e.key==='Escape')render();});}
+function addLR(){const v=document.getElementById('new-lr').value.trim();if(!v)return;if(lossReasons.includes(v)){toast('Ya existe');return}lossReasons.push(v);saveAll();render();toast('Motivo agregado');}
+function delLR(i){if(!confirm('¿Eliminar?'))return;lossReasons.splice(i,1);saveAll();render();}
+// CONTACTS
+function openNewContact(){document.getElementById('mt').textContent='Nuevo contacto';const mb=document.getElementById('mb');mb.innerHTML=`<div class="form-row"><div class="form-field"><label>Nombre *</label><input id="mn" placeholder="Juan Pérez"></div><div class="form-field"><label>Empresa</label><input id="mco" placeholder="Empresa SA"></div></div><div class="form-row"><div class="form-field"><label>Email</label><input id="me" type="email" placeholder="juan@empresa.com"></div><div class="form-field"><label>Teléfono</label><input id="mph" placeholder="81-1234-5678"></div></div><div class="form-row"><div class="form-field"><label>Estado</label><select id="ms"><option>Prospecto</option><option>Interesado</option><option>Cliente</option><option>Inactivo</option></select></div><div class="form-field"><label>Valor ($)</label><input id="mv" type="number" placeholder="0"></div></div><div class="form-field"><label>Notas</label><textarea id="mno" placeholder="Info adicional..."></textarea></div>`;mFn=()=>{const n=mb.querySelector('#mn').value.trim();if(!n){toast('Nombre requerido');return}contacts.push({id:nid(contacts),name:n,company:mb.querySelector('#mco').value,email:mb.querySelector('#me').value,phone:mb.querySelector('#mph').value,status:mb.querySelector('#ms').value,value:parseInt(mb.querySelector('#mv').value)||0,notes:mb.querySelector('#mno').value});saveAll();closeModal();render();toast('Contacto guardado');};openModal();}
+function editContact(id){const c=contacts.find(x=>x.id===id);if(!c)return;document.getElementById('mt').textContent='Editar contacto';const mb=document.getElementById('mb');mb.innerHTML=`<div class="form-row"><div class="form-field"><label>Nombre *</label><input id="mn"></div><div class="form-field"><label>Empresa</label><input id="mco"></div></div><div class="form-row"><div class="form-field"><label>Email</label><input id="me" type="email"></div><div class="form-field"><label>Teléfono</label><input id="mph"></div></div><div class="form-row"><div class="form-field"><label>Estado</label><select id="ms">${['Prospecto','Interesado','Cliente','Inactivo'].map(s=>`<option ${c.status===s?'selected':''}>${s}</option>`).join('')}</select></div><div class="form-field"><label>Valor ($)</label><input id="mv" type="number"></div></div><div class="form-field"><label>Notas</label><textarea id="mno"></textarea></div>`;mb.querySelector('#mn').value=c.name||'';mb.querySelector('#mco').value=c.company||'';mb.querySelector('#me').value=c.email||'';mb.querySelector('#mph').value=c.phone||'';mb.querySelector('#mv').value=c.value||0;mb.querySelector('#mno').value=c.notes||'';mFn=()=>{const n=mb.querySelector('#mn').value.trim();if(!n){toast('Nombre requerido');return}c.name=n;c.company=mb.querySelector('#mco').value;c.email=mb.querySelector('#me').value;c.phone=mb.querySelector('#mph').value;c.status=mb.querySelector('#ms').value;c.value=parseInt(mb.querySelector('#mv').value)||0;c.notes=mb.querySelector('#mno').value;saveAll();closeModal();render();toast('Contacto actualizado');};openModal();}
+function deleteContact(id){if(!confirm('¿Eliminar este contacto?'))return;contacts=contacts.filter(c=>c.id!==id);saveAll();render();toast('Contacto eliminado');}
+// DEALS
+function dFH(d){return`<div class="form-field"><label>Nombre del trato *</label><input id="dn" placeholder="Ej. Proyecto agua Q3"></div>
+<div class="form-row"><div class="form-field"><label>Empresa / Cliente</label><input id="dc" placeholder="Empresa"></div><div class="form-field"><label>Valor ($)</label><input id="dv" type="number" placeholder="0"></div></div>
+<div class="form-row"><div class="form-field"><label>Etapa</label><select id="dst">${stages.map(s=>`<option ${d&&d.stage===s.name?'selected':''}>${esc(s.name)}</option>`).join('')}</select></div><div class="form-field"><label>Probabilidad (%)</label><input id="dp" type="number" min="0" max="100"></div></div>
+<div class="form-row"><div class="form-field"><label>Vendedor</label><select id="dsel"><option value="">Sin asignar</option>${sellers.map(s=>`<option value="${esc(s)}" ${d&&d.seller===s?'selected':''}>${esc(s)}</option>`).join('')}</select></div><div class="form-field"><label>Estado</label><select id="dstat" onchange="document.getElementById('dlr').style.display=this.value==='lost'?'block':'none'"><option value="open" ${!d||d.status==='open'?'selected':''}>Abierto</option><option value="won" ${d&&d.status==='won'?'selected':''}>✓ Ganado</option><option value="lost" ${d&&d.status==='lost'?'selected':''}>✗ Perdido</option></select></div></div>
+<div id="dlr" class="form-field" style="display:${d&&d.status==='lost'?'block':'none'}"><label>Motivo de pérdida</label><select id="dlrv"><option value="">Sin especificar</option>${lossReasons.map(r=>`<option value="${esc(r)}" ${d&&d.lossReason===r?'selected':''}>${esc(r)}</option>`).join('')}</select></div>
+<div class="form-section-title">Seguimiento y periodicidad</div>
+<div class="form-row"><div class="form-field"><label>Tipo de seguimiento</label><select id="dft"><option value="">Sin seguimiento</option><option value="call" ${d&&d.followUpType==='call'?'selected':''}>📞 Llamada</option><option value="email" ${d&&d.followUpType==='email'?'selected':''}>✉️ Email</option><option value="meet" ${d&&d.followUpType==='meet'?'selected':''}>📅 Reunión</option><option value="note" ${d&&d.followUpType==='note'?'selected':''}>📝 Tarea</option></select></div><div class="form-field"><label>Fecha próximo contacto</label><input id="dfd" type="date" value="${d&&d.followUpDate?d.followUpDate:''}"></div></div>
+<div class="form-row"><div class="form-field"><label>Notas del seguimiento</label><input id="dfd2" placeholder="¿Qué se debe hacer?"></div><div class="form-field"><label>🔄 Periodicidad (días entre contactos)</label><input id="dper" type="number" min="1" placeholder="7" value="${d&&d.periodicity?d.periodicity:7}" title="Días que se suman automáticamente al completar una actividad"></div></div>`;}
+function cDeal(mb){const st=mb.querySelector('#dstat').value||'open',lrEl=mb.querySelector('#dlrv');return{company:mb.querySelector('#dc').value,value:parseInt(mb.querySelector('#dv').value)||0,prob:parseInt(mb.querySelector('#dp').value)||0,stage:mb.querySelector('#dst').value,seller:mb.querySelector('#dsel').value||'',status:st,lossReason:st==='lost'&&lrEl?lrEl.value:'',followUpDate:mb.querySelector('#dfd').value||null,followUpDesc:mb.querySelector('#dfd2').value||'',followUpType:mb.querySelector('#dft').value||'',periodicity:parseInt(mb.querySelector('#dper')?mb.querySelector('#dper').value:7)||7};}
+function openNewDeal(){document.getElementById('mt').textContent='Nuevo trato';const mb=document.getElementById('mb');mb.innerHTML=dFH(null);mb.querySelector('#dp').value=stages[0]?stages[0].prob:50;mb.querySelector('#dst').addEventListener('change',e=>{const st=stages.find(s=>s.name===e.target.value);if(st)mb.querySelector('#dp').value=st.prob;});mFn=()=>{const n=mb.querySelector('#dn').value.trim();if(!n){toast('Nombre requerido');return}const data=cDeal(mb);deals.push({id:nid(deals),name:n,...data,date:new Date().toISOString().split('T')[0],closedDate:data.status!=='open'?new Date().toISOString().split('T')[0]:null});saveAll();closeModal();render();toast('Trato guardado');};openModal();}
+function editDeal(id){const d=deals.find(x=>x.id===id);if(!d)return;document.getElementById('mt').textContent='Editar trato';const mb=document.getElementById('mb');mb.innerHTML=dFH(d);mb.querySelector('#dn').value=d.name||'';mb.querySelector('#dc').value=d.company||'';mb.querySelector('#dv').value=d.value||0;mb.querySelector('#dp').value=d.prob||0;mb.querySelector('#dfd2').value=d.followUpDesc||'';mFn=()=>{const n=mb.querySelector('#dn').value.trim();if(!n){toast('Nombre requerido');return}const data=cDeal(mb);Object.assign(d,{name:n,...data});if(d.status!=='open'&&!d.closedDate)d.closedDate=new Date().toISOString().split('T')[0];saveAll();closeModal();render();toast('Trato actualizado');};openModal();}
+function deleteDeal(id){if(!confirm('¿Eliminar este trato?'))return;deals=deals.filter(d=>d.id!==id);saveAll();render();toast('Trato eliminado');}
+function moveDeal(id,dir){const d=deals.find(x=>x.id===id);if(!d)return;const si=gsi(d.stage),ni=si+dir;if(ni<0||ni>=stages.length)return;d.stage=stages[ni].name;d.prob=stages[ni].prob;trackAdvance(d.stage);if(ni===stages.length-1&&d.status==='open'){d.status='won';d.closedDate=new Date().toISOString().split('T')[0];saveAll();render();toast('🎉 ¡Trato ganado!');return;}saveAll();render();toast('Movido a: '+d.stage);}
+// ACTIVITIES
+function rActs(){
+  // Combinar actividades manuales + seguimientos de tratos (como actividades virtuales)
+  const today=td0();
+
+  // Generar actividades desde tratos con followUpDate que no tengan actividad pendiente ligada
+  const dealActs=deals.filter(d=>d.followUpDate&&d.status==='open').map(d=>{
+    // Ver si ya existe una actividad pendiente ligada a este trato
+    const existing=activities.find(a=>a.dealId===d.id&&!a.done);
+    if(existing)return null; // ya existe, no duplicar
+    // Crear virtual activity desde el trato
+    return{
+      id:'deal_'+d.id,
+      type:d.followUpType||'call',
+      title:(AL[d.followUpType||'call']||'Contacto con')+' '+d.company,
+      desc:d.followUpDesc||'Seguimiento programado',
+      contactName:d.company,
+      date:d.followUpDate,
+      time:'📅 '+new Date(d.followUpDate+'T00:00:00').toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}),
+      dealId:d.id,
+      done:false,
+      doneAt:null,
+      virtual:true
+    };
+  }).filter(Boolean);
+
+  // Unir todas las actividades
+  const allActs=[...activities,...dealActs].sort((a,b)=>{
+    const da=a.date||'9999',db=b.date||'9999';
+    return da.localeCompare(db);
+  });
+
+  // Filtros
+  const filterAct=(a)=>{
+    if(a.done)return actTab==='done';
+    if(actTab==='done')return false;
+    if(actTab==='pending')return true;
+    if(actTab==='overdue'){const d=new Date(a.date+'T00:00:00');return a.date&&d<today;}
+    if(actTab==='today'){const d=new Date(a.date+'T00:00:00');return a.date&&Math.round((d-today)/86400000)===0;}
+    if(actTab==='week'){const d=new Date(a.date+'T00:00:00');const diff=Math.round((d-today)/86400000);return a.date&&diff>=0&&diff<=7;}
+    if(actTab==='month'){const d=new Date(a.date+'T00:00:00');const diff=Math.round((d-today)/86400000);return a.date&&diff>=0&&diff<=30;}
+    return true;
+  };
+  const filt=allActs.filter(filterAct);
+
+  const counts={
+    pending:allActs.filter(a=>!a.done).length,
+    done:allActs.filter(a=>a.done).length,
+    overdue:allActs.filter(a=>!a.done&&a.date&&new Date(a.date+'T00:00:00')<today).length,
+    today:allActs.filter(a=>!a.done&&a.date&&Math.round((new Date(a.date+'T00:00:00')-today)/86400000)===0).length,
+    week:allActs.filter(a=>!a.done&&a.date&&Math.round((new Date(a.date+'T00:00:00')-today)/86400000)>=0&&Math.round((new Date(a.date+'T00:00:00')-today)/86400000)<=7).length,
+    month:allActs.filter(a=>!a.done&&a.date&&Math.round((new Date(a.date+'T00:00:00')-today)/86400000)>=0&&Math.round((new Date(a.date+'T00:00:00')-today)/86400000)<=30).length,
+  };
+
+  const tabs=[
+    {k:'pending',label:'⏳ Pendientes',n:counts.pending},
+    {k:'overdue',label:'🔴 Vencidas',n:counts.overdue},
+    {k:'today',label:'🟠 Hoy',n:counts.today},
+    {k:'week',label:'📅 7 días',n:counts.week},
+    {k:'month',label:'📆 30 días',n:counts.month},
+    {k:'done',label:'✅ Completadas',n:counts.done},
+  ];
+
+  return`<div class="page-header"><div><p class="page-title">Actividades</p><p class="page-subtitle">${counts.pending} pendientes · ${counts.overdue} vencidas · ${counts.done} completadas</p></div><button class="btn btn-accent" onclick="openNewActivity()">+ Nueva actividad</button></div>
+  <div style="display:flex;gap:2px;background:var(--surface2);border-radius:var(--rad);padding:3px;margin-bottom:16px;flex-wrap:wrap">
+    ${tabs.map(t=>`<div class="tab ${actTab===t.k?'active':''}" onclick="actTab='${t.k}';render()" style="white-space:nowrap">${t.label}${t.n>0?' ('+t.n+')':''}</div>`).join('')}
+  </div>
+  <div class="card"><div class="card-pad">
+  ${filt.length?filt.map(a=>{
+    const deal=a.dealId?deals.find(d=>d.id===a.dealId):null;
+    const aDate=a.date?new Date(a.date+'T00:00:00'):null;
+    const diff=aDate?Math.round((aDate-today)/86400000):null;
+    const isOverdue=!a.done&&aDate&&aDate<today;
+    const isToday=!a.done&&diff===0;
+    const urgColor=isOverdue?'#fcebeb':isToday?'#fffbf3':'';
+    return`<div class="act-item" style="border-radius:var(--rad);padding:10px 8px;${urgColor?'background:'+urgColor+';margin-bottom:4px;border:1px solid '+(isOverdue?'#f09595':'#fac775')+';':''}${a.done?'opacity:.55':''}">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0;width:48px">
+        <div class="act-icon ${a.type}" style="margin:0;${a.done?'filter:grayscale(.8)':''}">${AI[a.type]||'📌'}</div>
+        ${!a.done
+          ?`<button onclick="completeActById('${a.id}',${a.virtual?true:false})" style="background:none;border:1px solid var(--accent);border-radius:999px;cursor:pointer;font-size:9px;padding:2px 5px;color:var(--accent);font-weight:600;white-space:nowrap">✓ Listo</button>`
+          :`<span style="font-size:9px;color:var(--accent);font-weight:600">✅</span>`
+        }
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500;${a.done?'text-decoration:line-through;color:var(--text3)':''}">
+          ${isOverdue?'🔴 ':''}${isToday?'🟠 ':''}${esc(a.title)}
+          ${a.virtual?'<span style="font-size:10px;background:#e6f1fb;color:#185fa5;border-radius:3px;padding:1px 5px;margin-left:4px">Pipeline</span>':''}
+        </div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px">${esc(a.desc)}</div>
+        ${deal?`<div style="font-size:11px;color:var(--text2);margin-top:3px;display:flex;align-items:center;gap:6px">
+          <span>🏢 <strong>${esc(deal.name)}</strong> · ${esc(deal.company)}</span>
+          ${deal.seller?`<span class="badge bg-gray" style="font-size:10px">👤 ${esc(deal.seller)}</span>`:''}
+          ${deal.periodicity?`<span style="font-size:10px;color:var(--text3)">🔄 cada ${deal.periodicity} días</span>`:''}
+        </div>`:''}
+        <div style="font-size:11px;color:${isOverdue?'#a32d2d':isToday?'#854f0b':'var(--text3)'};margin-top:3px;font-weight:${isOverdue||isToday?600:400}">
+          ${a.date?new Date(a.date+'T00:00:00').toLocaleDateString('es-MX',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}):'Sin fecha'}
+          ${isOverdue?' · ⚠️ Vencida hace '+Math.abs(diff)+' día'+(Math.abs(diff)===1?'':'s'):''}
+          ${isToday?' · ⚡ Hoy':''}
+          ${!isOverdue&&!isToday&&diff!==null&&diff>0?' · En '+diff+' día'+(diff===1?'':'s'):''}
+          ${a.done&&a.doneAt?' · ✅ Completada: '+a.doneAt:''}
+        </div>
+      </div>
+      ${!a.virtual?`<button class="btn btn-sm btn-danger" onclick="deleteActivity('${a.id}')" style="align-self:flex-start;flex-shrink:0">🗑️</button>`:''}
+    </div>`;
+  }).join(''):`<div class="empty"><div class="empty-icon">${actTab==='done'?'✅':'📭'}</div><p>Sin actividades en esta categoría</p></div>`}
+  </div></div>`;
+}
+function completeActById(rawId, isVirtual){
+  if(isVirtual){
+    const dealId=parseInt(String(rawId).replace('deal_',''));
+    const deal=deals.find(d=>d.id===dealId);
+    if(!deal)return;
+    const now=new Date();
+    // Guardar la actividad como completada
+    const completedAct={
+      id:nid(activities),
+      type:deal.followUpType||'call',
+      title:(AL[deal.followUpType||'call']||'Contacto con')+' '+deal.company,
+      desc:deal.followUpDesc||'Seguimiento',
+      contactName:deal.company,
+      date:deal.followUpDate,
+      time:now.toLocaleDateString('es-MX',{day:'2-digit',month:'short'}),
+      dealId:dealId,
+      done:true,
+      doneAt:now.toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}),
+      virtual:false
+    };
+    activities.push(completedAct);
+    // Limpiar followUpDate del trato para que desaparezca la actividad virtual
+    const oldType=deal.followUpType;
+    const oldDesc=deal.followUpDesc;
+    deal.followUpDate=null;
+    deal.followUpDesc='';
+    deal.followUpType='';
+    saveAll();
+    render(); // actualiza la lista inmediatamente antes del modal
+    scheduleNext(deal,oldType||'call',oldDesc||'Seguimiento',completedAct.id);
+  } else {
+    const id=typeof rawId==='string'?parseInt(rawId):rawId;
+    completeActivity(id);
+  }
+}
+function scheduleNext(deal,tipo,desc,actId){
+  const days=deal.periodicity||7;
+  document.getElementById('mt').textContent='✅ Completada — Programar siguiente';
+  const mb=document.getElementById('mb');
+  const calcDate=(n)=>{const d=new Date();d.setDate(d.getDate()+n);return d.toISOString().split('T')[0];};
+  mb.innerHTML=`
+    <div style="background:var(--accent-light);border-radius:var(--rad);padding:11px 14px;margin-bottom:14px;font-size:13px;color:var(--accent-dark)">
+      ✅ Actividad marcada como completada.
+    </div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:14px">🏢 <strong>${esc(deal.name)}</strong> · ${esc(deal.company)} · Periodicidad: <strong>${days} días</strong></div>
+    <p style="font-size:13px;font-weight:600;margin-bottom:12px">¿Programar el siguiente seguimiento?</p>
+    <div class="form-row">
+      <div class="form-field"><label>Tipo</label>
+        <select id="next-type">
+          <option value="call" ${tipo==='call'?'selected':''}>📞 Llamada</option>
+          <option value="email" ${tipo==='email'?'selected':''}>✉️ Email</option>
+          <option value="meet" ${tipo==='meet'?'selected':''}>📅 Reunión</option>
+          <option value="note">📝 Tarea</option>
+        </select>
+      </div>
+      <div class="form-field"><label>Días hasta el siguiente</label>
+        <input type="number" id="next-days" value="${days}" min="1">
+      </div>
+    </div>
+    <div class="form-field"><label>Fecha del próximo seguimiento</label>
+      <input type="date" id="next-date" value="${calcDate(days)}">
+    </div>
+    <div class="form-field"><label>Descripción</label>
+      <input id="next-desc" value="${esc(desc)}" placeholder="¿Qué hacer?">
+    </div>
+    <div style="font-size:11px;color:var(--text3)">💡 Cambia los días y la fecha se recalcula automáticamente.</div>`;
+  setTimeout(()=>{
+    const nd=document.getElementById('next-days');
+    if(nd)nd.addEventListener('input',()=>{const d=new Date();d.setDate(d.getDate()+(parseInt(nd.value)||7));const fd=document.getElementById('next-date');if(fd)fd.value=d.toISOString().split('T')[0];});
+  },80);
+  document.getElementById('btn-save').textContent='📅 Programar siguiente';
+  mFn=()=>{
+    const t=document.getElementById('next-type').value;
+    const dateVal=document.getElementById('next-date').value;
+    const descVal=document.getElementById('next-desc').value.trim();
+    if(!descVal){toast('Escribe una descripción');return;}
+    deal.followUpDate=dateVal;
+    deal.followUpDesc=descVal;
+    deal.followUpType=t;
+    saveAll();
+    closeModal();
+    document.getElementById('btn-save').textContent='Guardar';
+    render();
+    toast('📅 Siguiente seguimiento: '+new Date(dateVal+'T00:00:00').toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}));
+  };
+  // Si cancela, igual renderizar para reflejar que se completó
+  const origClose=window._origClose;
+  window._schedClose=()=>{closeModal();document.getElementById('btn-save').textContent='Guardar';render();};
+  document.getElementById('overlay').onclick=e=>{if(e.target===document.getElementById('overlay'))window._schedClose();};
+  openModal();
+}
+function openNewActivity(){
+  document.getElementById('mt').textContent='Nueva actividad';
+  const mb=document.getElementById('mb');
+  mb.innerHTML=`
+    <div class="form-row">
+      <div class="form-field"><label>Tipo</label>
+        <select id="at"><option value="call">📞 Llamada</option><option value="email">✉️ Email</option><option value="meet">📅 Reunión</option><option value="note">📝 Nota</option></select>
+      </div>
+      <div class="form-field"><label>Fecha</label>
+        <input type="date" id="adate" value="${new Date().toISOString().split('T')[0]}">
+      </div>
+    </div>
+    <div class="form-field"><label>Ligar a trato (opcional)</label>
+      <select id="adeal">
+        <option value="">Sin trato asociado</option>
+        ${deals.filter(d=>d.status==='open').map(d=>`<option value="${d.id}">${esc(d.name)} · ${esc(d.company)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-field"><label>Descripción *</label>
+      <textarea id="ad" placeholder="¿Qué pasó o qué se acordó?"></textarea>
+    </div>`;
+  mFn=()=>{
+    const desc=mb.querySelector('#ad').value.trim();
+    if(!desc){toast('Descripción requerida');return;}
+    const t=mb.querySelector('#at').value;
+    const dateVal=mb.querySelector('#adate').value;
+    const dealIdVal=mb.querySelector('#adeal').value;
+    const dealId=dealIdVal?parseInt(dealIdVal):null;
+    const deal=dealId?deals.find(d=>d.id===dealId):null;
+    const cn=deal?deal.company:'';
+    const now=new Date();
+    activities.push({id:nid(activities),type:t,title:AL[t]+' '+(cn||''),desc,contactName:cn,date:dateVal||now.toISOString().split('T')[0],time:now.toLocaleDateString('es-MX',{day:'2-digit',month:'short'})+' '+now.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'}),dealId,done:false,doneAt:null,virtual:false});
+    // Si tiene trato y fecha, actualizar followUp del trato también
+    if(deal&&dateVal){deal.followUpDate=dateVal;deal.followUpDesc=desc;deal.followUpType=t;}
+    saveAll();closeModal();render();toast('Actividad registrada');
+  };
+  openModal();
+}
+function completeActivity(id){
+  const a=activities.find(x=>x.id===id);if(!a)return;
+  a.done=true;
+  a.doneAt=new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'});
+  const deal=a.dealId?deals.find(d=>d.id===a.dealId):null;
+  const oldType=a.type,oldDesc=a.desc;
+  // Limpiar followUpDate del trato para que no regenere la actividad virtual
+  if(deal){deal.followUpDate=null;deal.followUpDesc='';deal.followUpType='';}
+  saveAll();
+  render(); // actualiza la lista inmediatamente antes del modal
+  if(deal){scheduleNext(deal,oldType,oldDesc,a.id);}
+  else{toast('✅ Actividad completada');}
+}
+function deleteActivity(rawId){
+  const id=typeof rawId==='string'&&rawId.startsWith('deal_')?null:parseInt(rawId);
+  if(!id){toast('Las actividades del pipeline se eliminan desde el trato');return;}
+  activities=activities.filter(a=>a.id!==id);saveAll();render();toast('Actividad eliminada');
+}
+// MODAL
+function openModal(){document.getElementById('overlay').classList.add('open');}
+function closeModal(){
+  document.getElementById('overlay').classList.remove('open');
+  const btn=document.getElementById('btn-save');
+  if(btn)btn.textContent='Guardar';
+  // Restore default overlay click handler
+  document.getElementById('overlay').onclick=e=>{if(e.target===document.getElementById('overlay'))closeModal();};
+}
+function saveModal(){if(mFn)mFn();}
+document.getElementById('overlay').addEventListener('click',e=>{if(e.target===document.getElementById('overlay'))closeModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2500);}
+render();
+</script>
+</body>
+</html>

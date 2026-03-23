@@ -145,32 +145,6 @@ textarea.f-input{resize:vertical;min-height:80px;line-height:1.5;}
 .placeholder h3{font-size:1.1rem;font-weight:600;color:var(--txt2);margin-bottom:0.3rem;}
 
 @media(max-width:700px){.container{padding:0.8rem;}.q-row{grid-template-columns:1fr 1fr;}}
-
-@media print{
-  @page{size:letter portrait;margin:0.5cm;}
-  body[data-printing] .topbar,
-  body[data-printing] .module,
-  body[data-printing] #mod-config,
-  body[data-printing] .actions-bar{display:none !important;}
-  body[data-printing] .module[data-print-target]{
-    display:block !important;
-    zoom:0.62;
-    width:160%;
-    transform-origin:top left;
-    -webkit-print-color-adjust:exact !important;
-    print-color-adjust:exact !important;
-  }
-  body[data-printing] .module[data-print-target] *{
-    -webkit-print-color-adjust:exact !important;
-    print-color-adjust:exact !important;
-  }
-  body[data-printing] .module[data-print-target] .actions-bar{display:none !important;}
-  body[data-printing] .module[data-print-target] .btn,
-  body[data-printing] .module[data-print-target] button{display:none !important;}
-  body[data-printing] .module[data-print-target] .add-bar,
-  body[data-printing] .module[data-print-target] .q-builder,
-  body[data-printing] .module[data-print-target] .diagram-wrap{display:none !important;}
-}
 </style>
 </head>
 <body>
@@ -235,7 +209,7 @@ textarea.f-input{resize:vertical;min-height:80px;line-height:1.5;}
     </div>
   </div></div>
   <div class="totals-bar"><div class="ti"><div class="tl">Total Equipos</div><div class="tv" id="tEquip">$0.00</div></div><div class="ti"><div class="tl">Total Indirectos</div><div class="tv" id="tInd">$0.00</div></div><div class="ti"><div class="tl">Costo Financiero</div><div class="tv" id="tCredit" style="color:#f59e0b;">$0.00</div></div><div class="ti hl"><div class="tl">Total Proyecto</div><div class="tv" id="tProj">$0.00</div></div><div class="ti"><div class="tl">Factor Lang (Proyecto ÷ Equipos)</div><div class="tv" id="tLang" style="color:#f59e0b;">—</div><div style="font-size:0.65rem;color:rgba(255,255,255,0.3);margin-top:0.2rem;" id="tLangRef">Ref: Sólidos 3.10 | Mixto 3.63 | Fluidos 4.74</div></div></div>
-  <div class="actions-bar"><button class="btn btn-o" onclick="toggleDiagram()">📊 Diagrama de Bloques</button><button class="btn btn-g btn-disabled">📄 Generar Propuesta</button><button class="btn btn-g" onclick="printSheet('mod-proyectos')">🖨️ Guardar Hoja PDF</button></div>
+  <div class="actions-bar"><button class="btn btn-o" onclick="toggleDiagram()">📊 Diagrama de Bloques</button><button class="btn btn-g btn-disabled">📄 Generar Propuesta</button></div>
   <div class="diagram-wrap" id="diagramWrap"><h4>Diagrama de Bloques</h4><div id="diagramSvg"></div></div>
 </div>
 
@@ -284,7 +258,7 @@ textarea.f-input{resize:vertical;min-height:80px;line-height:1.5;}
     <div class="margin-row"><label>Días de Crédito:</label><input class="ind-pct-input" type="number" id="sCreditDays" value="0" min="0" oninput="calcSvcTotals()" style="width:70px"><span style="font-size:0.82rem;color:var(--txt3)">días × 0.05% diario (18% anual)</span><span class="mono" style="font-weight:600;color:var(--amber);margin-left:auto" id="sCreditAmt">$0 MXN</span></div>
   </div></div>
   <div class="totals-bar"><div class="ti"><div class="tl">Mano de Obra</div><div class="tv" id="sMO">$0</div></div><div class="ti"><div class="tl">Materiales</div><div class="tv" id="sMat">$0</div></div><div class="ti"><div class="tl">Subtotal</div><div class="tv" id="sSub">$0</div></div><div class="ti"><div class="tl">Utilidad</div><div class="tv" id="sUtil">$0</div></div><div class="ti"><div class="tl">Costo Financiero</div><div class="tv" id="sCredit" style="color:#f59e0b;">$0</div></div><div class="ti hl"><div class="tl">Total Servicio</div><div class="tv" id="sTotal">$0</div></div></div>
-  <div class="actions-bar"><button class="btn btn-g btn-disabled">📄 Generar Cotización PDF</button><button class="btn btn-g" onclick="printSheet('mod-servicios')">🖨️ Guardar Hoja PDF</button></div>
+  <div class="actions-bar"><button class="btn btn-g btn-disabled">📄 Generar Cotización PDF</button></div>
 </div>
 
 <!-- ════════════════════════════════════════════ -->
@@ -462,7 +436,7 @@ textarea.f-input{resize:vertical;min-height:80px;line-height:1.5;}
     "La póliza se cotiza por activo y nivel de control, no por volumen de químico ni número de visitas."
   </p>
 
-  <div class="actions-bar"><button class="btn btn-g" onclick="generatePolizaPDF()">📄 Generar PDF Cotización</button><button class="btn btn-g" onclick="printSheet('mod-polizas')">🖨️ Guardar Hoja PDF</button></div>
+  <div class="actions-bar"><button class="btn btn-g" onclick="generatePolizaPDF()">📄 Generar PDF Cotización</button></div>
 </div>
 <div class="module" id="mod-dispensadores"><div class="placeholder"><div class="ph-ico">💧</div><h3>Renta de Dispensadores de Agua</h3><p>Este módulo estará disponible próximamente.</p></div></div>
 
@@ -748,18 +722,6 @@ let tarifas=[
 let moLines=[], matSvcLines=[];
 const TC={tanque:'chip-blue',intercambiador:'chip-pink',bomba:'chip-green',compresor:'chip-amber',torre:'chip-purple',reactor:'chip-orange',filtro:'chip-gray',caldera:'chip-orange',otro:'chip-gray'};
 const TTC={personal:'chip-blue',transporte:'chip-amber',herramienta:'chip-green',alimentacion:'chip-orange',hospedaje:'chip-purple',otro:'chip-gray'};
-
-// ═══════════════════════ PRINT SHEET ═══════════════════════
-function printSheet(moduleId){
-  const mod=document.getElementById(moduleId);
-  mod.setAttribute('data-print-target','1');
-  document.body.setAttribute('data-printing','1');
-  window.print();
-  setTimeout(()=>{
-    mod.removeAttribute('data-print-target');
-    document.body.removeAttribute('data-printing');
-  },500);
-}
 
 // ═══════════════════════ NAV ═══════════════════════
 function toggleDD(id){

@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc -l \"c:\\\\Users\\\\user\\\\OneDrive\\\\EDUARDO CASTAÑO\\\\Codigos HTML\\\\Claude\\\\cotizador-tecnico \\(1\\).html\")",
+      "Bash(wc -l \"/c/Users/user/OneDrive/EDUARDO CASTAÑO/Codigos HTML/Claude/cotizador-tecnico \\(1\\).html\")",
+      "Bash(python -c \":*)",
+      "Read(//usr/**)",
+      "Read(//usr/local/**)",
+      "Bash(perl -ne 'printf \"\"%d: %s\"\", $., $_ if \\($. >= 668 && $. <= 760 && length\\($_\\) < 200\\)' \"C:/Users/user/OneDrive/EDUARDO CASTAÑO/Codigos HTML/Claude/cotizador-tecnico \\(1\\).html\")",
+      "Bash(perl -ne 'printf \"\"%d: %s\"\", $., $_ if \\($. >= 1630 && $. <= 1667 && length\\($_\\) < 300\\)' \"C:/Users/user/OneDrive/EDUARDO CASTAÑO/Codigos HTML/Claude/cotizador-tecnico \\(1\\).html\")",
+      "Bash(wc -l \"C:/Users/user/OneDrive/EDUARDO CASTAÑO/Codigos HTML/Claude/GMAO_Sistema \\(3\\).html\")",
+      "Bash(perl -ne 'printf \"\"%d: %s\"\", $., $_ if \\($. >= 342 && $. <= 360 && length\\($_\\) < 300\\)' \"C:/Users/user/OneDrive/EDUARDO CASTAÑO/Codigos HTML/Claude/GMAO_Sistema \\(3\\).html\")",
+      "Bash(perl -ne 'print if \\($. >= 50 && $. <= 342\\)' \"C:/Users/user/OneDrive/EDUARDO CASTAÑO/Codigos HTML/Claude/GMAO_Sistema \\(3\\).html\")",
+      "Read(//tmp/**)",
+      "Bash(perl /tmp/build_suite.pl)",
+      "Read(//c/tmp/**)",
+      "Read(//c/tmp//**)",
+      "Bash(echo $TMPDIR)",
+      "Bash(echo $TEMP)",
+      "Bash(perl --version)",
+      "Bash(ls /tmp/build*)",
+      "Bash(ls /tmp/*.pl)",
+      "Bash(ls -la /tmp/*.pl /tmp/*.txt)",
+      "Bash(WORKDIR=\"/c/Users/user/OneDrive/EDUARDO CASTAÑO/Codigos HTML/Claude\" ls \"$WORKDIR\")",
+      "Bash(printf '%s\\\\n' 'use strict; use warnings; binmode\\(STDOUT, \"\":utf8\"\"\\);')",
+      "Bash(printf '%s\\\\n' 'my $dir = \"\"/c/Users/user/OneDrive/EDUARDO CASTA\\\\xc3\\\\xb1O/Codigos HTML/Claude\"\";')",
+      "Bash(printf '%s\\\\n' 'my $cot_f = \"\"$dir/cotizador-tecnico \\(1\\).html\"\";')",
+      "Bash(printf '%s\\\\n' 'my $gm_f  = \"\"$dir/GMAO_Sistema \\(3\\).html\"\";')",
+      "Bash(printf '%s\\\\n' 'my $out_f = \"\"$dir/techpro-suite.html\"\";')",
+      "Bash(perl -ne 'print if /getElementById|const app\\\\b/' /tmp/gmao_js.txt)",
+      "Bash(perl -e \":*)",
+      "Bash(perl -ne 'printf \"\"%d: %s\"\", $., $_ if \\($. >= 1662 && $. <= 1667\\)' \"C:/Users/user/OneDrive/EDUARDO CASTAÑO/Codigos HTML/Claude/cotizador-tecnico \\(1\\).html\")"
+    ]
+  }
+}
