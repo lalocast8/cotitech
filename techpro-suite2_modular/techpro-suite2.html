@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TechPro Suite &mdash; Sistemas </title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="stylesheet" href="assets/css/crm.css">
+</head>
+<body>
+
+<!-- TOPBAR UNIFICADO -->
+<div class="topbar" style="height:48px;">
+  <div class="brand" onclick="switchModule('comercial')">&#x25CF;&#x25E6; TechPro Suite</div>
+  <div class="nav-group" id="subnav-main">
+    <div class="nav-dd" id="ddMantenimiento">
+      <button class="nav-dd-btn" onclick="toggleDD('ddMantenimiento')">Mantenimiento <span class="arrow">&#9662;</span></button>
+      <div class="nav-dd-menu" id="ddMantenimiento-menu">
+        <div class="nav-dd-item" data-route="mantenimiento-gmao" onclick="switchModule('mantenimiento')"><span class="ico">&#128295;</span> GMAO</div>
+        <div class="nav-dd-item" data-route="mantenimiento-wes" onclick="switchModule('wes')"><span class="ico">&#128200;</span> WES 4.0 <span class="badge-soon">Pronto</span></div>
+      </div>
+    </div>
+    <div class="nav-dd" id="ddComercial">
+      <button class="nav-dd-btn" onclick="toggleDD('ddComercial')">Comercial <span class="arrow">&#9662;</span></button>
+      <div class="nav-dd-menu" id="ddComercial-menu">
+        <div class="nav-dd-item" data-route="comercial-crm" onclick="switchModule('crm')"><span class="ico">&#129309;</span> CRM</div>
+        <div class="nav-sep"></div>
+        <div class="nav-dd-sub" id="ddComercialCoti">
+          <button class="nav-dd-sub-btn" onclick="toggleDDSub('ddComercialCoti');event.stopPropagation();">Cotizador <span class="arrow">&#9656;</span></button>
+          <div class="nav-dd-sub-menu" id="ddComercialCoti-menu">
+            <div class="nav-dd-item" data-mod="proyectos" onclick="go('proyectos')"><span class="ico">&#128208;</span> Proyectos</div>
+            <div class="nav-dd-item" data-mod="servicios" onclick="go('servicios')"><span class="ico">&#128295;</span> Servicios Generales</div>
+            <div class="nav-dd-item" data-mod="polizas" onclick="go('polizas')"><span class="ico">&#128203;</span> P&oacute;lizas Mantenimiento</div>
+            <div class="nav-dd-item disabled" data-mod="dispensadores"><span class="ico">&#128167;</span> Renta Dispensadores <span class="badge-soon">Pronto</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="nav-dd" id="ddCompras">
+      <button class="nav-dd-btn" onclick="toggleDD('ddCompras')">Compras <span class="arrow">&#9662;</span></button>
+      <div class="nav-dd-menu" id="ddCompras-menu">
+        <div class="nav-dd-item" data-mod="requisiciones" onclick="go('requisiciones')"><span class="ico">&#128221;</span> Requisiciones</div>
+        <div class="nav-dd-item" data-mod="compras" onclick="go('compras')"><span class="ico">&#128722;</span> Compras</div>
+      </div>
+    </div>
+    <div class="nav-dd" id="ddFacturacion">
+      <button class="nav-dd-btn" onclick="toggleDD('ddFacturacion')">Facturaci&oacute;n <span class="arrow">&#9662;</span></button>
+      <div class="nav-dd-menu" id="ddFacturacion-menu">
+        <div class="nav-dd-item" data-mod="pedidos" onclick="go('pedidos')"><span class="ico">&#128230;</span> Pedidos</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULO COMERCIAL -->
+<div id="wrap-comercial">
+<div class="container">
+
+<!-- ════════════════════════════════════════════ -->
+<!-- ════ COTIZADOR PROYECTOS ════ -->
+<!-- ════════════════════════════════════════════ -->
+<div class="module active" id="mod-proyectos">
+  <h2 class="sec-title">Cotizador de Proyectos</h2>
+  <p class="sec-sub">Selecciona equipos del catálogo, define flujo requerido y agrega costos indirectos.</p>
+  <div class="q-builder">
+    <div class="q-builder-title">Agregar Equipo al Proyecto</div>
+    <div class="q-row">
+      <div class="fg"><label class="f-label">Equipo (catálogo)</label><select class="f-select" id="qEquip" onchange="onQEquipChange()"><option value="">— Seleccionar —</option></select></div>
+      <div class="fg"><label class="f-label">Flujo Ref. (S₁)</label><input class="f-input" id="qS1" readonly></div>
+      <div class="fg"><label class="f-label">Costo Ref. (C₁)</label><input class="f-input" id="qC1" readonly></div>
+      <div class="fg"><label class="f-label">Factor (n)</label><input class="f-input" id="qN" readonly></div>
+    </div>
+    <div class="q-row">
+      <div class="fg"><label class="f-label">Flujo Requerido (S₂)</label><input class="f-input" id="qS2" type="number" step="any" placeholder="Flujo deseado" oninput="qPreview()"></div>
+      <div class="fg"><label class="f-label">Cantidad</label><input class="f-input" id="qQty" type="number" value="1" min="1" oninput="qPreview()"></div>
+      <div class="fg"><label class="f-label">Notas</label><input class="f-input" id="qNotes" placeholder="Opcional"></div>
+    </div>
+    <div class="q-preview" id="qPreviewBar">
+      <div><div class="qp-label">Costo Unit.</div><div class="qp-val" id="qpUnit">$0</div></div>
+      <div><div class="qp-label">Subtotal</div><div class="qp-val" id="qpTotal">$0</div></div>
+      <div style="margin-left:auto"><button class="btn btn-p" onclick="addLine()">+ Agregar</button></div>
+    </div>
+  </div>
+  <div class="card"><div class="card-h"><span>Partidas de Equipos <span class="count" id="lineCount">0</span></span><button class="btn btn-d btn-sm" onclick="clearLines()">Limpiar</button></div><div style="overflow-x:auto"><table><thead><tr><th>#</th><th>Tag</th><th>Equipo</th><th>Flujo Ref→Req</th><th>n</th><th>Cant</th><th>Cost Unit</th><th>Subtotal</th><th></th></tr></thead><tbody id="linesBody"></tbody></table></div><div class="empty" id="linesEmpty"><div class="empty-ico">📐</div>Agrega equipos desde el panel superior</div></div>
+  <div class="card"><div class="card-h"><span>Costos Indirectos</span><button class="btn btn-o btn-sm" onclick="go('config');setTimeout(()=>{document.querySelectorAll('.cfg-nav-item')[2].click()},100)" title="Editar catálogo de indirectos">⚙️ Editar Catálogo</button></div><div class="card-b" style="padding:0"><table><thead><tr><th style="width:40px">#</th><th>Concepto</th><th style="width:50px">Cant</th><th style="width:80px">Tipo</th><th style="width:90px">% ó Monto</th><th style="width:120px;text-align:right">Costo Unit.</th><th style="width:120px;text-align:right">Subtotal</th></tr></thead><tbody id="indBody"></tbody><tfoot><tr style="background:#f0f4f8;border-top:2px solid var(--border)"><td colspan="5"></td><td style="text-align:right;font-weight:700;font-size:0.75rem;color:var(--txt2)">TOTAL INDIRECTOS</td><td class="ind-val highlight" id="indTotal" style="padding:0.6rem">$0</td></tr></tfoot></table></div></div>
+  <div class="card"><div class="card-h"><span>Costo Financiero — Días de Crédito</span></div><div class="card-b">
+    <div style="display:flex;align-items:center;gap:0.8rem;flex-wrap:wrap;">
+      <label class="f-label" style="margin:0">Días de Crédito:</label>
+      <input class="ind-pct-input" type="number" id="pCreditDays" value="0" min="0" step="1" oninput="calcTotals()" style="width:70px">
+      <span style="font-size:0.82rem;color:var(--txt3)">días × 0.05% diario (18% anual)</span>
+      <span class="mono" style="font-weight:600;color:var(--amber);margin-left:auto" id="pCreditAmt">$0.00</span>
+    </div>
+  </div></div>
+  <div class="totals-bar"><div class="ti"><div class="tl">Total Equipos</div><div class="tv" id="tEquip">$0.00</div></div><div class="ti"><div class="tl">Total Indirectos</div><div class="tv" id="tInd">$0.00</div></div><div class="ti"><div class="tl">Costo Financiero</div><div class="tv" id="tCredit" style="color:#f59e0b;">$0.00</div></div><div class="ti hl"><div class="tl">Total Proyecto</div><div class="tv" id="tProj">$0.00</div></div><div class="ti"><div class="tl">Factor Lang (Proyecto ÷ Equipos)</div><div class="tv" id="tLang" style="color:#f59e0b;">—</div><div style="font-size:0.65rem;color:rgba(255,255,255,0.3);margin-top:0.2rem;" id="tLangRef">Ref: Sólidos 3.10 | Mixto 3.63 | Fluidos 4.74</div></div></div>
+  <div class="actions-bar"><button class="btn btn-o" onclick="toggleDiagram()">📊 Diagrama de Bloques</button><button class="btn btn-p" onclick="generateProposal()">📋 Copiar para Propuesta</button><button class="btn btn-g" onclick="printSheet('mod-proyectos')">🖨️ Guardar Hoja PDF</button></div>
+  <div class="diagram-wrap" id="diagramWrap"><h4>Diagrama de Bloques</h4><div id="diagramHtml" style="overflow-x:auto;padding:10px 0;"></div></div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- ════ SERVICIOS GENERALES ════ -->
+<!-- ════════════════════════════════════════════ -->
+<div class="module" id="mod-servicios">
+  <h2 class="sec-title">Cotizador de Servicios Generales</h2>
+  <p class="sec-sub">Cotiza servicios de mantenimiento con descripción profesional, mano de obra y materiales.</p>
+  <!-- Parte 1 -->
+  <div class="card"><div class="card-h"><span>Parte 1 — Descripción del Servicio</span></div><div class="card-b">
+    <div class="fg" style="margin-bottom:0.6rem"><label class="f-label">Nombre del Servicio</label><input class="f-input" id="svcName" placeholder="Ej: Mantenimiento a Filtro Zeolita"></div>
+    <div class="fg"><label class="f-label">Describe el trabajo con tus palabras</label><textarea class="f-input" id="svcRaw" placeholder="Ej: Sacar material del filtro, lijar por dentro, pintar epóxico, cargar material nuevo..."></textarea></div>
+    <div style="margin-top:0.6rem;display:flex;gap:0.5rem;align-items:center">
+      <button class="btn btn-purple" onclick="enhanceText()" id="aiBtn">✨ Mejorar con IA</button>
+      <span id="aiLoading" style="display:none"><span class="loading-dots"><span></span><span></span><span></span></span> <span style="font-size:0.8rem;color:var(--purple);margin-left:0.3rem">Procesando...</span></span>
+    </div>
+    <div class="ai-output" id="aiOutput"><div class="ai-badge"><span class="spark">✨</span> Descripción Profesional (editable)</div><div contenteditable="true" id="aiText" style="outline:none"></div></div>
+  </div></div>
+  <!-- Parte 2 -->
+  <div class="card"><div class="card-h"><span>Parte 2 — Mano de Obra <span class="count" id="moCount">0</span></span></div>
+    <div style="overflow-x:auto"><table><thead><tr><th>#</th><th>Rol</th><th>Tarifa Diaria</th><th>Días</th><th>Personas</th><th style="text-align:right">Subtotal</th><th></th></tr></thead><tbody id="moBody"></tbody></table></div>
+    <div class="empty" id="moEmpty"><div class="empty-ico">👷</div>Agrega personal</div>
+    <div class="add-bar">
+      <div class="fg" style="flex:2"><label class="f-label">Seleccionar del Catálogo</label><select class="f-select" id="moSel"><option value="">— Seleccionar —</option></select></div>
+      <div class="fg"><label class="f-label">Días</label><input class="f-input" id="moDias" type="number" value="1" min="1"></div>
+      <div class="fg"><label class="f-label">Personas</label><input class="f-input" id="moPers" type="number" value="1" min="1"></div>
+      <div class="fg"><label class="f-label">&nbsp;</label><button class="btn btn-p" onclick="addMO()">+ Agregar</button></div>
+    </div>
+  </div>
+  <!-- Parte 3 -->
+  <div class="card"><div class="card-h"><span>Parte 3 — Materiales y Consumibles <span class="count" id="matSvcCount">0</span></span></div>
+    <div style="overflow-x:auto"><table><thead><tr><th>#</th><th>Material / Equipo</th><th>Cant</th><th>Unidad</th><th>Precio Unit.</th><th style="text-align:right">Subtotal</th><th></th></tr></thead><tbody id="matSvcBody"></tbody></table></div>
+    <div class="empty" id="matSvcEmpty"><div class="empty-ico">🔩</div>Agrega materiales</div>
+    <div class="add-bar">
+      <div class="fg" style="flex:2"><label class="f-label">Descripción</label><input class="f-input" id="mDesc" placeholder="Tubería PVC 2 pulg"></div>
+      <div class="fg"><label class="f-label">Cant</label><input class="f-input" id="mCant" type="number" step="any" value="1"></div>
+      <div class="fg"><label class="f-label">Unidad</label><input class="f-input" id="mUnidad" value="pza"></div>
+      <div class="fg"><label class="f-label">Precio Unit. MXN</label><input class="f-input" id="mPrecio" type="number" step="any"></div>
+      <div class="fg"><label class="f-label">&nbsp;</label><button class="btn btn-p" onclick="addMatSvc()">+ Agregar</button></div>
+    </div>
+  </div>
+  <!-- Parte 4 -->
+  <div class="card"><div class="card-h"><span>Parte 4 — Resumen</span></div><div class="card-b">
+    <div class="margin-row"><label>Margen de Utilidad:</label><input class="ind-pct-input" type="number" id="svcMargin" value="20" min="0" oninput="calcSvcTotals()"><span style="font-size:0.82rem;color:var(--txt3)">%</span></div>
+    <div class="margin-row"><label>Días de Crédito:</label><input class="ind-pct-input" type="number" id="sCreditDays" value="0" min="0" oninput="calcSvcTotals()" style="width:70px"><span style="font-size:0.82rem;color:var(--txt3)">días × 0.05% diario (18% anual)</span><span class="mono" style="font-weight:600;color:var(--amber);margin-left:auto" id="sCreditAmt">$0 MXN</span></div>
+  </div></div>
+  <div class="totals-bar"><div class="ti"><div class="tl">Mano de Obra</div><div class="tv" id="sMO">$0</div></div><div class="ti"><div class="tl">Materiales</div><div class="tv" id="sMat">$0</div></div><div class="ti"><div class="tl">Subtotal</div><div class="tv" id="sSub">$0</div></div><div class="ti"><div class="tl">Utilidad</div><div class="tv" id="sUtil">$0</div></div><div class="ti"><div class="tl">Costo Financiero</div><div class="tv" id="sCredit" style="color:#f59e0b;">$0</div></div><div class="ti hl"><div class="tl">Total Servicio</div><div class="tv" id="sTotal">$0</div></div></div>
+  <div class="actions-bar"><button class="btn btn-g btn-disabled">📄 Generar Cotización PDF</button><button class="btn btn-g" onclick="printSheet('mod-servicios')">🖨️ Guardar Hoja PDF</button></div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- ════ PLACEHOLDERS ════ -->
+<!-- ════════════════════════════════════════════ -->
+<div class="module" id="mod-polizas">
+  <h2 class="sec-title">Cotizador de Pólizas de Mantenimiento</h2>
+  <p class="sec-sub">Tratamiento de agua industrial — Cotización por activo y nivel de control.</p>
+
+  <!-- PASO 0: Datos de la Cotización -->
+  <div class="card">
+    <div class="card-h"><span>Datos de la Cotización</span></div>
+    <div class="card-b">
+      <div class="q-row">
+        <div class="fg"><label class="f-label">Folio</label><input class="f-input" id="polFolio" placeholder="252655"></div>
+        <div class="fg"><label class="f-label">Fecha</label><input class="f-input" id="polFecha" type="date"></div>
+        <div class="fg"><label class="f-label">Validez</label><input class="f-input" id="polValidez" value="30 DIAS"></div>
+        <div class="fg"><label class="f-label">Condiciones de Pago</label><input class="f-input" id="polCondPago" value="CREDITO AUTORIZADO"></div>
+      </div>
+      <div class="q-row">
+        <div class="fg"><label class="f-label">Atención a (Cliente)</label><input class="f-input" id="polCliente" placeholder="PORCELANA CORONA MEXICO (PLANTA RAMOS ARIZPE)"></div>
+        <div class="fg"><label class="f-label">Meses de contrato</label><input class="f-input" id="polMeses" type="number" value="12" min="1"></div>
+        <div class="fg"><label class="f-label">Presupuestado por</label><input class="f-input" id="polVendedor" placeholder="Jaime Bautista"></div>
+        <div class="fg"><label class="f-label">Email</label><input class="f-input" id="polEmail" placeholder="ventas@vecsawater.com"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASO 1: Tipo de Póliza -->
+  <div class="card">
+    <div class="card-h"><span>Paso 1 — Tipo de Póliza y Frecuencia</span></div>
+    <div class="card-b">
+      <div class="q-row">
+        <div class="fg"><label class="f-label">Tipo de Póliza</label>
+          <select class="f-select" id="polTipo" onchange="polTipoChange()">
+            <option value="visitas">A) Póliza por Visitas + HH</option>
+            <option value="dedicado">B) Póliza con Personal Dedicado</option>
+          </select>
+        </div>
+        <div class="fg" id="polFreqWrap"><label class="f-label">Frecuencia de Visitas</label>
+          <select class="f-select" id="polFreq" onchange="polCalc()">
+            <option value="1sem">1 visita/semana (4/mes)</option>
+            <option value="2sem">2 visitas/semana (8/mes)</option>
+            <option value="3mes">3 visitas/mes</option>
+            <option value="2mes">2 visitas/mes</option>
+            <option value="1mes">1 visita/mes</option>
+          </select>
+        </div>
+        <div class="fg"><label class="f-label">Planta / Ubicación</label><input class="f-input" id="polPlanta" placeholder="Ubicación"></div>
+      </div>
+      <!-- Personal dedicado options (hidden by default) -->
+      <div id="polDedicadoOpts" style="display:none;margin-top:0.6rem;">
+        <div class="q-row">
+          <div class="fg"><label class="f-label">Técnico 48h/sem</label>
+            <select class="f-select" id="polTecTipo" onchange="polCalc()">
+              <option value="con_sup">Con supervisor en planta</option>
+              <option value="sin_sup">Sin supervisor en planta</option>
+            </select>
+          </div>
+          <div class="fg"><label class="f-label">Cantidad de Técnicos</label>
+            <input class="f-input" id="polTecQty" type="number" value="1" min="1" max="20" onchange="polCalc()" oninput="polCalc()">
+          </div>
+          <div class="fg"><label class="f-label">Supervisor en Planta</label>
+            <select class="f-select" id="polSup" onchange="polCalc()">
+              <option value="no">No incluir</option>
+              <option value="1">Sí — 1 supervisor</option>
+              <option value="2">2 supervisores</option>
+            </select>
+          </div>
+          <div class="fg"><label class="f-label">Químico / Laboratorista</label>
+            <select class="f-select" id="polQuim" onchange="polCalc()">
+              <option value="no">No incluir</option>
+              <option value="1">Sí — 1 químico</option>
+              <option value="2">2 químicos</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASO 2: Activos -->
+  <div class="card">
+    <div class="card-h"><span>Paso 2 — Activos del Cliente <span class="count" id="polActCount">0</span></span></div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>#</th><th>Categoría</th><th>Cant</th><th>Capacidad</th><th>Clasificación</th><th>Notas</th><th></th></tr></thead>
+        <tbody id="polActBody"></tbody>
+      </table>
+    </div>
+    <div class="empty" id="polActEmpty"><div class="empty-ico">🏭</div>Agrega los activos del cliente</div>
+    <div class="add-bar">
+      <div class="fg"><label class="f-label">Categoría</label>
+        <select class="f-select" id="paCat" onchange="paAutoClass()">
+          <option value="torre">Torre de Enfriamiento</option>
+          <option value="ro">Ósmosis Inversa</option>
+          <option value="chiller">Chiller</option>
+          <option value="boiler">Boiler sin Vapor</option>
+        </select>
+      </div>
+      <div class="fg"><label class="f-label">Cantidad</label><input class="f-input" id="paCant" type="number" value="1" min="1"></div>
+      <div class="fg"><label class="f-label">Capacidad</label><input class="f-input" id="paCap" type="number" step="any" placeholder="0" oninput="paAutoClass()"></div>
+      <div class="fg"><label class="f-label">Unidad</label><input class="f-input" id="paUnit" value="GPM" readonly></div>
+      <div class="fg"><label class="f-label">Clasificación</label><input class="f-input" id="paClass" readonly></div>
+      <div class="fg"><label class="f-label">Notas</label><input class="f-input" id="paNotes" placeholder="Opc."></div>
+      <div class="fg"><label class="f-label">&nbsp;</label><button class="btn btn-p" onclick="addPolActivo()">+ Agregar</button></div>
+    </div>
+  </div>
+
+  <!-- PASO 3: Equipos en Comodato -->
+  <div class="card">
+    <div class="card-h"><span>Paso 3 — Equipos en Comodato (Renta Mensual) <span class="count" id="comodCount">0</span></span><button class="btn btn-o btn-sm" onclick="go('config');setTimeout(()=>{document.querySelectorAll('.cfg-nav-item')[5].click()},100)">⚙️ Catálogo</button></div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>#</th><th>Equipo</th><th>Capacidad</th><th>Cant</th><th>Renta/Mes Unit.</th><th style="text-align:right">Subtotal/Mes</th><th></th></tr></thead>
+        <tbody id="comodBody"></tbody>
+      </table>
+    </div>
+    <div class="empty" id="comodEmpty"><div class="empty-ico">🔄</div>Agrega equipos en comodato que provees al cliente</div>
+    <div class="add-bar">
+      <div class="fg" style="flex:2"><label class="f-label">Equipo del Catálogo</label>
+        <select class="f-select" id="comodSel"><option value="">— Seleccionar —</option></select>
+      </div>
+      <div class="fg"><label class="f-label">Cantidad</label><input class="f-input" id="comodQty" type="number" value="1" min="1"></div>
+      <div class="fg"><label class="f-label">Notas</label><input class="f-input" id="comodNotes" placeholder="Opc."></div>
+      <div class="fg"><label class="f-label">&nbsp;</label><button class="btn btn-p" onclick="addComod()">+ Agregar</button></div>
+    </div>
+  </div>
+
+  <!-- PASO 4: Desglose automático -->
+  <div class="card">
+    <div class="card-h"><span>Desglose de Cotización</span><button class="btn btn-o btn-sm" onclick="polCalc()">🔄 Recalcular</button></div>
+    <div class="card-b" style="padding:0">
+      <table>
+        <thead><tr><th style="width:40px">#</th><th>Concepto</th><th style="text-align:right;width:120px">Cantidad</th><th style="text-align:right;width:130px">Precio Unit.</th><th style="text-align:right;width:130px">Subtotal</th></tr></thead>
+        <tbody id="polDesBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Resumen agrupado -->
+  <div class="card">
+    <div class="card-h"><span>Resumen Comercial (Agrupación Final)</span></div>
+    <div class="card-b" style="padding:0">
+      <table>
+        <thead><tr><th>Grupo</th><th style="text-align:right">Mensual MXN</th></tr></thead>
+        <tbody>
+          <tr><td><strong>1. Mano de Obra / Servicio</strong><br><span style="font-size:0.78rem;color:var(--txt3)" id="polMOdet">Visitas + HH</span></td><td class="mono" style="text-align:right;font-weight:600" id="polGMO">$0</td></tr>
+          <tr><td><strong>2. Análisis Físico-Químicos</strong><br><span style="font-size:0.78rem;color:var(--txt3)" id="polANdet">—</span></td><td class="mono" style="text-align:right;font-weight:600" id="polGAN">$0</td></tr>
+          <tr><td><strong>3. Comodato</strong><br><span style="font-size:0.78rem;color:var(--txt3)" id="polCOdet">Renta de equipos</span></td><td class="mono" style="text-align:right;font-weight:600" id="polGCO">$0</td></tr>
+          <tr><td><strong>4. Consumibles</strong><br><span style="font-size:0.78rem;color:var(--txt3)" id="polCONdet">Lote mensual químicos</span></td><td class="mono" style="text-align:right;font-weight:600" id="polGCON">$0</td></tr>
+          <tr style="border-top:2px solid var(--border);background:#f8fafc"><td><strong>Subtotal Técnico</strong></td><td class="mono" style="text-align:right;font-weight:700" id="polSubTec">$0</td></tr>
+          <tr><td><strong>Admón. + Reportes + Riesgo (15%)</strong></td><td class="mono" style="text-align:right;font-weight:600" id="polAdmin">$0</td></tr>
+          <tr><td><strong>Costo Financiero</strong><br><span style="font-size:0.78rem;color:var(--txt3)"><input class="ind-pct-input" type="number" id="polCreditDays" value="0" min="0" style="width:60px" oninput="polUpdateSummary()"> días × 0.05% diario</span></td><td class="mono" style="text-align:right;font-weight:600;color:var(--amber)" id="polCredit">$0</td></tr>
+          <tr style="background:#f0f4f8"><td><strong>Total sin IVA</strong></td><td class="mono" style="text-align:right;font-weight:700;font-size:0.95rem;color:var(--accent)" id="polTotalSin">$0</td></tr>
+          <tr><td>IVA 16%</td><td class="mono" style="text-align:right" id="polIVA">$0</td></tr>
+          <tr style="background:var(--dark);color:white"><td style="padding:0.8rem;font-weight:700">Total con IVA (Mensual)</td><td class="mono" style="text-align:right;padding:0.8rem;font-weight:700;font-size:1.1rem;color:#34d399" id="polTotalIVA">$0</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── DIAGNÓSTICO TÉCNICO ── -->
+  <div class="card">
+    <div class="card-h">
+      <span>Diagnóstico Técnico Actual</span>
+      <button class="btn btn-p btn-sm" onclick="addDiagBlock()">+ Agregar Sección</button>
+    </div>
+    <div id="diagContainer">
+      <div class="empty" id="diagEmpty"><div class="empty-ico">🔬</div>Agrega secciones de diagnóstico: calidad de agua, imágenes, observaciones, etc.</div>
+    </div>
+  </div>
+
+  <p style="font-size:0.82rem;color:var(--txt2);font-style:italic;margin-top:0.5rem;padding:0.6rem;background:var(--amber-bg);border-radius:6px;">
+    "La póliza se cotiza por activo y nivel de control, no por volumen de químico ni número de visitas."
+  </p>
+
+  <div class="actions-bar"><button class="btn btn-p" onclick="generatePolizaProposal()">📋 Copiar para Propuesta</button><button class="btn btn-g" onclick="generatePolizaPDF()">📄 Generar PDF Cotización</button><button class="btn btn-g" onclick="printSheet('mod-polizas')">🖨️ Guardar Hoja PDF</button></div>
+</div>
+<div class="module" id="mod-dispensadores"><div class="placeholder"><div class="ph-ico">💧</div><h3>Renta de Dispensadores de Agua</h3><p>Este módulo estará disponible próximamente.</p></div></div>
+<div class="module" id="mod-requisiciones"><div class="placeholder"><div class="ph-ico">&#128221;</div><h3>Requisiciones</h3><p>M&oacute;dulo listo para implementaci&oacute;n.</p></div></div>
+<div class="module" id="mod-compras"><div class="placeholder"><div class="ph-ico">&#128722;</div><h3>Compras</h3><p>M&oacute;dulo listo para implementaci&oacute;n.</p></div></div>
+<div class="module" id="mod-pedidos"><div class="placeholder"><div class="ph-ico">&#128230;</div><h3>Pedidos</h3><p>M&oacute;dulo listo para implementaci&oacute;n.</p></div></div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- ════ CONFIGURACIÓN ════ -->
+<!-- ════════════════════════════════════════════ -->
+<div class="module" id="mod-config">
+  <h2 class="sec-title">Configuración</h2>
+  <p class="sec-sub">Administra catálogos, tarifas y parámetros generales de cada cotizador.</p>
+
+  <div class="cfg-grid">
+    <div class="cfg-sidebar">
+      <div class="cfg-nav-label">General</div>
+      <div class="cfg-nav-item active" onclick="cfgGo('general')"><span class="ci">⚙️</span> Parámetros Generales</div>
+      <div class="cfg-nav-label">Catálogos</div>
+      <div class="cfg-nav-item" onclick="cfgGo('cat-equipos')"><span class="ci">📦</span> Equipos (Proyectos)</div>
+      <div class="cfg-nav-item" onclick="cfgGo('cat-indirectos')"><span class="ci">📊</span> Costos Indirectos</div>
+      <div class="cfg-nav-item" onclick="cfgGo('cat-tarifas')"><span class="ci">👷</span> Tarifas (Servicios)</div>
+      <div class="cfg-nav-item" onclick="cfgGo('cat-exponentes')"><span class="ci">📐</span> Exponentes Típicos</div>
+      <div class="cfg-nav-item" onclick="cfgGo('cat-poliza')"><span class="ci">📋</span> Tabulador Pólizas</div>
+      <div class="cfg-nav-item" onclick="cfgGo('cat-comodato')"><span class="ci">🔄</span> Catálogo Comodato</div>
+    </div>
+
+    <div>
+      <!-- General -->
+      <div class="cfg-panel active" id="cfg-general">
+        <div class="card"><div class="card-h"><span>Parámetros Generales</span></div><div class="card-b">
+          <div class="q-row" style="max-width:500px">
+            <div class="fg"><label class="f-label">Moneda Proyectos</label><select class="f-select" id="setCurrency"><option value="USD">USD — Dólar</option><option value="MXN">MXN — Peso</option><option value="EUR">EUR — Euro</option></select></div>
+            <div class="fg"><label class="f-label">Moneda Servicios</label><input class="f-input" value="MXN" readonly></div>
+          </div>
+        </div></div>
+        <div class="card"><div class="card-h"><span>Ajuste CEPCI (Inflación)</span></div><div class="card-b">
+          <div class="q-row" style="max-width:500px">
+            <div class="fg"><label class="f-label">CEPCI Referencia (I₁)</label><input class="f-input" id="setCepci1" type="number" value="816" step="any"></div>
+            <div class="fg"><label class="f-label">CEPCI Actual (I₂)</label><input class="f-input" id="setCepci2" type="number" value="866" step="any"></div>
+          </div>
+          <label style="display:flex;align-items:center;gap:0.5rem;margin-top:0.4rem;font-size:0.85rem;color:var(--txt2);cursor:pointer"><input type="checkbox" id="setUseCepci" style="accent-color:var(--accent);width:16px;height:16px"> Aplicar CEPCI a cotizaciones de proyectos</label>
+        </div></div>
+      </div>
+
+      <!-- Catálogo Equipos -->
+      <div class="cfg-panel" id="cfg-cat-equipos">
+        <div class="card"><div class="card-h"><span>Catálogo de Equipos — Proyectos <span class="count" id="catCount">0</span></span></div>
+          <div style="overflow-x:auto"><table><thead><tr><th>Tag</th><th>Descripción</th><th>Tipo</th><th>Flujo Ref.</th><th>Unidad</th><th>Costo (USD)</th><th>Factor n</th><th>Proveedor</th><th>Notas</th><th></th></tr></thead><tbody id="catBody"></tbody></table></div>
+          <div class="add-bar">
+            <div class="fg"><label class="f-label">Tag</label><input class="f-input" id="cTag" placeholder="E-101"></div>
+            <div class="fg"><label class="f-label">Descripción</label><input class="f-input" id="cDesc" placeholder="Intercambiador"></div>
+            <div class="fg"><label class="f-label">Tipo</label><select class="f-select" id="cType"><option value="tanque">Tanque</option><option value="intercambiador">Intercambiador</option><option value="bomba">Bomba</option><option value="compresor">Compresor</option><option value="torre">Torre/Columna</option><option value="reactor">Reactor</option><option value="filtro">Filtro</option><option value="caldera">Caldera</option><option value="otro">Otro</option></select></div>
+            <div class="fg"><label class="f-label">Flujo Ref.</label><input class="f-input" id="cFlow" type="number" step="any"></div>
+            <div class="fg"><label class="f-label">Unidad</label><input class="f-input" id="cUnit" value="GPM"></div>
+            <div class="fg"><label class="f-label">Costo USD</label><input class="f-input" id="cCost" type="number" step="any"></div>
+            <div class="fg"><label class="f-label">Factor n</label><input class="f-input" id="cExp" type="number" step="0.01" value="0.6"></div>
+            <div class="fg"><label class="f-label">Proveedor</label><input class="f-input" id="cProv" placeholder="Alfa Laval"></div>
+            <div class="fg"><label class="f-label">Notas</label><input class="f-input" id="cNotes" placeholder="Opc."></div>
+            <div class="fg"><label class="f-label">&nbsp;</label><button class="btn btn-p" onclick="addCat()">+ Agregar</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Costos Indirectos -->
+      <div class="cfg-panel" id="cfg-cat-indirectos">
+        <div class="card"><div class="card-h"><span>Catálogo Costos Indirectos — Proyectos <span class="count" id="indCfgCount">0</span></span></div>
+          <div style="overflow-x:auto">
+            <table>
+              <thead><tr><th style="width:55px">#</th><th>Concepto</th><th style="width:90px">Tipo</th><th style="width:80px">% Default</th><th style="width:110px">Monto Fijo</th><th style="width:55px">Cant</th><th style="width:40px"></th></tr></thead>
+              <tbody id="indCfgBody"></tbody>
+            </table>
+          </div>
+          <div class="add-bar">
+            <div class="fg" style="width:60px;flex:0 0 60px"><label class="f-label">Num</label><input class="f-input" id="iNum" placeholder="3.12"></div>
+            <div class="fg" style="flex:3"><label class="f-label">Concepto</label><input class="f-input" id="iConcept" placeholder="Nuevo concepto indirecto"></div>
+            <div class="fg"><label class="f-label">Tipo</label><select class="f-select" id="iMode"><option value="pct">% sobre equipos</option><option value="fixed">Monto fijo</option></select></div>
+            <div class="fg"><label class="f-label">% Default</label><input class="f-input" id="iPct" type="number" step="0.1" value="0" placeholder="0"></div>
+            <div class="fg"><label class="f-label">Monto Fijo</label><input class="f-input" id="iFixed" type="number" step="any" value="0" placeholder="0"></div>
+            <div class="fg"><label class="f-label">Cant</label><input class="f-input" id="iQty" type="number" value="1" min="0"></div>
+            <div class="fg"><label class="f-label">&nbsp;</label><button class="btn btn-p" onclick="addIndItem()">+ Agregar</button></div>
+          </div>
+        </div>
+        <p style="font-size:0.78rem;color:var(--txt3);margin-top:0.3rem;">⚙️ Los cambios aquí actualizan la tabla de costos indirectos en el Cotizador de Proyectos.</p>
+      </div>
+
+      <!-- Tarifas Servicios -->
+      <div class="cfg-panel" id="cfg-cat-tarifas">
+        <div class="card"><div class="card-h"><span>Catálogo de Tarifas — Servicios Generales <span class="count" id="tarifaCount">0</span></span></div>
+          <div style="overflow-x:auto"><table><thead><tr><th>Rol / Concepto</th><th>Tipo</th><th>Tarifa Diaria (MXN)</th><th></th></tr></thead><tbody id="tarifaBody"></tbody></table></div>
+          <div class="add-bar">
+            <div class="fg" style="flex:2"><label class="f-label">Rol / Concepto</label><input class="f-input" id="tRol" placeholder="Soldador especializado"></div>
+            <div class="fg"><label class="f-label">Tipo</label><select class="f-select" id="tTipo"><option value="personal">Personal</option><option value="transporte">Transporte</option><option value="herramienta">Herramienta</option><option value="alimentacion">Alimentación</option><option value="hospedaje">Hospedaje</option><option value="otro">Otro</option></select></div>
+            <div class="fg"><label class="f-label">Tarifa Diaria MXN</label><input class="f-input" id="tTarifa" type="number" step="any"></div>
+            <div class="fg"><label class="f-label">&nbsp;</label><button class="btn btn-p" onclick="addTarifa()">+ Agregar</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Exponentes -->
+      <div class="cfg-panel" id="cfg-cat-exponentes">
+        <div class="card"><div class="card-h"><span>Referencia — Exponentes Típicos por Tipo de Equipo</span></div><div class="card-b">
+          <table><thead><tr><th>Tipo de Equipo</th><th>Rango (n)</th><th>Valor Sugerido</th></tr></thead><tbody>
+            <tr><td>Tanques de almacenamiento</td><td class="mono">0.50 – 0.70</td><td><span class="exp-chip">0.60</span></td></tr>
+            <tr><td>Intercambiadores de calor</td><td class="mono">0.60 – 0.70</td><td><span class="exp-chip">0.65</span></td></tr>
+            <tr><td>Bombas centrífugas</td><td class="mono">0.30 – 0.50</td><td><span class="exp-chip">0.40</span></td></tr>
+            <tr><td>Compresores</td><td class="mono">0.70 – 0.80</td><td><span class="exp-chip">0.75</span></td></tr>
+            <tr><td>Torres / Columnas</td><td class="mono">0.60 – 0.70</td><td><span class="exp-chip">0.65</span></td></tr>
+            <tr><td>Reactores</td><td class="mono">0.50 – 0.70</td><td><span class="exp-chip">0.60</span></td></tr>
+            <tr><td>Filtros</td><td class="mono">0.50 – 0.65</td><td><span class="exp-chip">0.58</span></td></tr>
+            <tr><td>Calderas</td><td class="mono">0.60 – 0.80</td><td><span class="exp-chip">0.70</span></td></tr>
+          </tbody></table>
+          <p style="margin-top:0.8rem;font-size:0.82rem;color:var(--txt3);">Fuente: Peters & Timmerhaus, Plant Design and Economics for Chemical Engineers. Los valores se pueden ajustar por equipo individual en el catálogo.</p>
+        </div></div>
+      </div>
+
+      <!-- Tabulador Pólizas -->
+      <div class="cfg-panel" id="cfg-cat-poliza">
+        <div class="card"><div class="card-h"><span>Tabulador — Visitas y Mano de Obra</span></div><div class="card-b">
+          <table><thead><tr><th>Concepto</th><th style="width:150px">Valor (MXN)</th></tr></thead><tbody>
+            <tr><td>Costo por visita</td><td><input class="ind-fixed-input" type="number" id="tabVisita" value="1000" onchange="polCalc()"></td></tr>
+            <tr><td>Costo por HH</td><td><input class="ind-fixed-input" type="number" id="tabHH" value="1000" onchange="polCalc()"></td></tr>
+            <tr><td>Técnico dedicado (con supervisor)</td><td><input class="ind-fixed-input" type="number" id="tabTecCon" value="50000" onchange="polCalc()"></td></tr>
+            <tr><td>Técnico dedicado (sin supervisor)</td><td><input class="ind-fixed-input" type="number" id="tabTecSin" value="55000" onchange="polCalc()"></td></tr>
+            <tr><td>Supervisor en planta</td><td><input class="ind-fixed-input" type="number" id="tabSup" value="65000" onchange="polCalc()"></td></tr>
+            <tr><td>Químico / Laboratorista</td><td><input class="ind-fixed-input" type="number" id="tabQuim" value="55000" onchange="polCalc()"></td></tr>
+          </tbody></table>
+          <p style="font-size:0.75rem;font-weight:600;color:var(--txt2);margin:1rem 0 0.4rem;">Tabla HH por Visita según Activos</p>
+          <table id="tabHHTable"><thead><tr><th>Desde</th><th>Hasta</th><th>HH/visita</th><th></th></tr></thead><tbody id="tabHHBody"></tbody></table>
+          <div class="add-bar" style="border:none;padding:0.5rem 0 0">
+            <div class="fg"><label class="f-label">Desde</label><input class="f-input" id="hhFrom" type="number" min="1" placeholder="1"></div>
+            <div class="fg"><label class="f-label">Hasta</label><input class="f-input" id="hhTo" type="number" placeholder="99"></div>
+            <div class="fg"><label class="f-label">HH</label><input class="f-input" id="hhVal" type="number" step="0.5" placeholder="2"></div>
+            <div class="fg"><label class="f-label">&nbsp;</label><button class="btn btn-p btn-sm" onclick="addHHRow()">+ Agregar</button></div>
+          </div>
+        </div></div>
+
+        <div class="card"><div class="card-h"><span>Tabulador — Análisis Físico-Químicos</span></div><div class="card-b">
+          <table><thead><tr><th>Concepto</th><th style="width:150px">Precio/visita (MXN)</th></tr></thead><tbody>
+            <tr><td>Ósmosis Inversa (Conductividad + pH)</td><td><input class="ind-fixed-input" type="number" id="tabAnRO" value="200" onchange="polCalc()"></td></tr>
+            <tr><td>Boiler sin Vapor</td><td><input class="ind-fixed-input" type="number" id="tabAnBoiler" value="450" onchange="polCalc()"></td></tr>
+          </tbody></table>
+          <p style="font-size:0.75rem;font-weight:600;color:var(--txt2);margin:0.8rem 0 0.4rem;">Torres / Chillers — Precio por activo por visita</p>
+          <table id="tabAnTCTable"><thead><tr><th>Desde</th><th>Hasta</th><th>$/activo/visita</th><th></th></tr></thead><tbody id="tabAnTCBody"></tbody></table>
+          <div class="add-bar" style="border:none;padding:0.5rem 0 0">
+            <div class="fg"><label class="f-label">Desde</label><input class="f-input" id="anFrom" type="number" min="1" placeholder="1"></div>
+            <div class="fg"><label class="f-label">Hasta</label><input class="f-input" id="anTo" type="number" placeholder="99"></div>
+            <div class="fg"><label class="f-label">$/activo</label><input class="f-input" id="anVal" type="number" placeholder="500"></div>
+            <div class="fg"><label class="f-label">&nbsp;</label><button class="btn btn-p btn-sm" onclick="addAnTCRow()">+ Agregar</button></div>
+          </div>
+        </div></div>
+
+        <div class="card"><div class="card-h"><span>Tabulador — Consumibles (Lote Mensual)</span></div><div class="card-b">
+          <p style="font-size:0.75rem;font-weight:600;color:var(--txt2);margin-bottom:0.4rem;">Torres de Enfriamiento — VEC-313 + VEC-151</p>
+          <table><thead><tr><th>Clasificación</th><th>Precio/mes (MXN)</th></tr></thead><tbody>
+            <tr><td>Pequeña (< 3 GPM)</td><td><input class="ind-fixed-input" type="number" id="tabConTP" value="2500" onchange="polCalc()"></td></tr>
+            <tr><td>Mediana (3.5 – 7.5 GPM)</td><td><input class="ind-fixed-input" type="number" id="tabConTM" value="3500" onchange="polCalc()"></td></tr>
+            <tr><td>Grande (8 – 12 GPM)</td><td><input class="ind-fixed-input" type="number" id="tabConTG" value="6500" onchange="polCalc()"></td></tr>
+          </tbody></table>
+          <p style="font-size:0.75rem;font-weight:600;color:var(--txt2);margin:0.8rem 0 0.4rem;">Ósmosis Inversa — VEC-SG11 + Cartuchos</p>
+          <table><thead><tr><th>Clasificación</th><th>Precio/mes (MXN)</th></tr></thead><tbody>
+            <tr><td>Pequeña (< 9 GPM)</td><td><input class="ind-fixed-input" type="number" id="tabConRP" value="4000" onchange="polCalc()"></td></tr>
+            <tr><td>Mediana (9 – 15 GPM)</td><td><input class="ind-fixed-input" type="number" id="tabConRM" value="6500" onchange="polCalc()"></td></tr>
+            <tr><td>Grande (16 – 25 GPM)</td><td><input class="ind-fixed-input" type="number" id="tabConRG" value="15000" onchange="polCalc()"></td></tr>
+            <tr><td>XL (> 25 GPM) — $/GPM</td><td><input class="ind-fixed-input" type="number" id="tabConRXL" value="450" onchange="polCalc()"></td></tr>
+          </tbody></table>
+          <p style="font-size:0.75rem;font-weight:600;color:var(--txt2);margin:0.8rem 0 0.4rem;">Chillers — Inhibidor VEC-288</p>
+          <table><thead><tr><th>Clasificación</th><th>Precio/mes (MXN)</th></tr></thead><tbody>
+            <tr><td>Pequeña (≤ 1 m³)</td><td><input class="ind-fixed-input" type="number" id="tabConCP" value="2000" onchange="polCalc()"></td></tr>
+            <tr><td>Mediana (≤ 5 m³)</td><td><input class="ind-fixed-input" type="number" id="tabConCM" value="3000" onchange="polCalc()"></td></tr>
+            <tr><td>Grande (≤ 10 m³)</td><td><input class="ind-fixed-input" type="number" id="tabConCG" value="6000" onchange="polCalc()"></td></tr>
+            <tr><td>XL (> 10 m³) — $/m³</td><td><input class="ind-fixed-input" type="number" id="tabConCXL" value="450" onchange="polCalc()"></td></tr>
+          </tbody></table>
+          <p style="font-size:0.75rem;font-weight:600;color:var(--txt2);margin:0.8rem 0 0.4rem;">Boilers sin Vapor — Consumibles</p>
+          <table><thead><tr><th>Concepto</th><th>Precio/mes (MXN)</th></tr></thead><tbody>
+            <tr><td>Consumibles por boiler/mes</td><td><input class="ind-fixed-input" type="number" id="tabConBoiler" value="500" onchange="polCalc()"></td></tr>
+          </tbody></table>
+        </div></div>
+      </div>
+
+      <!-- Catálogo Comodato -->
+      <div class="cfg-panel" id="cfg-cat-comodato">
+        <div class="card"><div class="card-h"><span>Catálogo de Equipos en Comodato <span class="count" id="comodCatCount">0</span></span></div>
+          <div style="overflow-x:auto">
+            <table>
+              <thead><tr><th>Equipo</th><th>Capacidad</th><th>Unidad</th><th>Renta/Mes (MXN)</th><th>Notas</th><th></th></tr></thead>
+              <tbody id="comodCatBody"></tbody>
+            </table>
+          </div>
+          <div class="add-bar">
+            <div class="fg" style="flex:2"><label class="f-label">Equipo</label><input class="f-input" id="ccEquipo" placeholder="Filtro lateral"></div>
+            <div class="fg"><label class="f-label">Capacidad</label><input class="f-input" id="ccCap" placeholder="15"></div>
+            <div class="fg"><label class="f-label">Unidad</label><input class="f-input" id="ccUnit" value="GPM"></div>
+            <div class="fg"><label class="f-label">Renta/Mes MXN</label><input class="f-input" id="ccRenta" type="number" step="any"></div>
+            <div class="fg"><label class="f-label">Notas</label><input class="f-input" id="ccNotes" placeholder="1 por torre"></div>
+            <div class="fg"><label class="f-label">&nbsp;</label><button class="btn btn-p" onclick="addComodCat()">+ Agregar</button></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+</div><!-- /wrap-comercial -->
+
+<!-- MODULO MANTENIMIENTO -->
+<div id="wrap-mantenimiento">
+  <div id="gmao-app"></div>
+  <div id="wes-app">
+    <div class="placeholder">
+      <div class="ph-ico">&#128200;</div>
+      <h3>WES 4.0</h3>
+      <p>Subm&oacute;dulo de mantenimiento predictivo listo para futura implementaci&oacute;n.</p>
+    </div>
+  </div>
+</div><!-- /wrap-mantenimiento -->
+
+<!-- w -->
+<div id="wrap-crm" style="display:none;">
+  <div id="crm-app">
+    <!-- CRM nav and main go here, rendered by crmRender() -->
+    <nav class="crm-nav" id="crm-nav">
+      <!-- CRM sidebar navigation -->
+      <div class="crm-nav-brand">
+        <div class="crm-brand-dot">C</div>
+        <span>NovaCRM</span>
+      </div>
+      <div class="crm-nav-section">Principal</div>
+      <div class="crm-nav-item active" onclick="crmShow('dashboard')" id="crm-nav-dashboard">
+        <span style="width:18px;text-align:center">📊</span><span>Dashboard</span>
+      </div>
+      <div class="crm-nav-item" onclick="crmShow('contactos')" id="crm-nav-contactos">
+        <span style="width:18px;text-align:center">👤</span><span>Contactos</span>
+      </div>
+      <div class="crm-nav-item" onclick="crmShow('hot10')" id="crm-nav-hot10">
+        <span style="width:18px;text-align:center">🔥</span><span>HOT 10</span>
+      </div>
+      <div class="crm-nav-item" onclick="crmShow('pipeline')" id="crm-nav-pipeline">
+        <span style="width:18px;text-align:center">📈</span><span>Pipeline</span>
+      </div>
+      <div class="crm-nav-item" onclick="crmShow('actividades')" id="crm-nav-actividades">
+        <span style="width:18px;text-align:center">⏰</span><span>Actividades</span>
+      </div>
+      <div class="crm-nav-section">Equipo</div>
+      <div class="crm-nav-item" onclick="crmShow('vendedores')" id="crm-nav-vendedores">
+        <span style="width:18px;text-align:center">🧑‍💼</span><span>Vendedores</span>
+      </div>
+      <div class="crm-nav-section">Sistema</div>
+      <div class="crm-nav-item" onclick="crmShow('configuracion')" id="crm-nav-configuracion">
+        <span style="width:18px;text-align:center">⚙️</span><span>Configuración</span>
+      </div>
+      <div class="crm-nav-spacer"></div>
+      <div class="crm-nav-footer">
+        <div class="crm-nav-user">
+          <div class="crm-nav-av">CRM</div>
+          <div style="flex:1;overflow:hidden">
+            <div style="font-size:12px;font-weight:500">Mi CRM</div>
+            <div style="font-size:11px;color:var(--crm-text3)">Admin</div>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <main class="crm-main" id="crm-mc"></main>
+  </div>
+  <!-- CRM Modal overlay (position:fixed, funciona fuera de #crm-app) -->
+  <div class="crm-overlay" id="crm-overlay">
+    <div class="crm-modal">
+      <p class="crm-modal-title" id="crm-mt"></p>
+      <div id="crm-mb"></div>
+      <div class="crm-modal-footer">
+        <button class="crm-btn" onclick="if(window._schedClose){window._schedClose();window._schedClose=null;}else{crmCloseModal();}">Cancelar</button>
+        <button class="crm-btn crm-btn-accent" id="crm-btn-save" onclick="crmSaveModal()">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/comercial.js" defer></script>
+<script src="assets/js/gmao.js" defer></script>
+<script src="assets/js/crm.js" defer></script>
+</body>
+</html>
+

@@ -1,0 +1,95 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CRM Local</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div>
+        <h1>CRM Local</h1>
+        <p>Gestión simple de clientes, oportunidades y tareas</p>
+      </div>
+      <button id="seedBtn" class="secondary">Cargar datos de ejemplo</button>
+    </header>
+
+    <section class="kpis" id="kpis"></section>
+
+    <main class="grid">
+      <section class="panel">
+        <h2>Contactos</h2>
+        <form id="contactForm" class="form">
+          <input name="name" placeholder="Nombre" required />
+          <input name="email" type="email" placeholder="Correo" required />
+          <input name="phone" placeholder="Teléfono" />
+          <button type="submit">Agregar contacto</button>
+        </form>
+        <ul id="contactList" class="list"></ul>
+      </section>
+
+      <section class="panel">
+        <h2>Empresas</h2>
+        <form id="companyForm" class="form">
+          <input name="name" placeholder="Empresa" required />
+          <input name="sector" placeholder="Sector" />
+          <input name="website" placeholder="Sitio web" />
+          <button type="submit">Agregar empresa</button>
+        </form>
+        <ul id="companyList" class="list"></ul>
+      </section>
+
+      <section class="panel">
+        <h2>Oportunidades</h2>
+        <form id="dealForm" class="form">
+          <input name="title" placeholder="Título" required />
+          <input name="amount" type="number" min="0" step="0.01" placeholder="Monto" required />
+          <select name="stage" required>
+            <option value="Prospección">Prospección</option>
+            <option value="Calificación">Calificación</option>
+            <option value="Propuesta">Propuesta</option>
+            <option value="Negociación">Negociación</option>
+            <option value="Ganada">Ganada</option>
+            <option value="Perdida">Perdida</option>
+          </select>
+          <button type="submit">Agregar oportunidad</button>
+        </form>
+
+        <label class="filter">
+          Filtrar por etapa:
+          <select id="dealFilter">
+            <option value="Todas">Todas</option>
+            <option value="Prospección">Prospección</option>
+            <option value="Calificación">Calificación</option>
+            <option value="Propuesta">Propuesta</option>
+            <option value="Negociación">Negociación</option>
+            <option value="Ganada">Ganada</option>
+            <option value="Perdida">Perdida</option>
+          </select>
+        </label>
+
+        <ul id="dealList" class="list"></ul>
+      </section>
+
+      <section class="panel">
+        <h2>Tareas</h2>
+        <form id="taskForm" class="form">
+          <input name="title" placeholder="Tarea" required />
+          <input name="dueDate" type="date" required />
+          <select name="priority" required>
+            <option value="Alta">Alta</option>
+            <option value="Media">Media</option>
+            <option value="Baja">Baja</option>
+          </select>
+          <button type="submit">Agregar tarea</button>
+        </form>
+        <ul id="taskList" class="list"></ul>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
